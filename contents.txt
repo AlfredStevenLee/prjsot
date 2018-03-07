@@ -1,0 +1,49 @@
+<div class="container" style="margin: auto; padding: 3px">
+  <div class="row" style="font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif; margin: auto; ">
+
+    <h3>
+      <img src="img/sotlogo.png" width="25px" height="25px" style="padding: 0 0"/>
+      <span style="margin-left: 10px">SOT - Shopping & Trading Platform based on Ethereum ERC20 Token</span>
+    </h3>
+  </div>
+</div>
+<div class="container" style="margin-top:25px; padding: 3px">
+  <h1>1. About us</h1>
+  -Our team is IT consulting and development group located in Korea
+  <br>-In recent, cryptocurrency is about to change traditional currency, its ecosystem, process too and we all for it
+  <br>-In this point we found that there should be more Dapp services in real world, more people could use easily. So we decided to develop Token based platform in which people could trade goods, physical & logical products easily
+  <br>-We are utilizing Ethereum based ERC20 token which called SOT (Shopping and Trading Token). SOT will be used for payment in SOT online shopping mall and other market places too. SOT could be integrated easily with other traditional market places by our SOT API  that will be given
+  <br><br>
+  <h1>2. Our Vision</h1>
+  -Our vision is to serve open marketplace based on cryptocurrency for giving more chances to utilize cryptocurrency in the world
+  <br>-For this, our service will give possibilities to trade P2P side product or talent like afterschool program, consulting service, photographer, drawing, travel guide and also B2C product too. Cryptocurrency doesn't need central management for payment and it makes P2P market more active because we don't need to use creditcard or banking transfer service in complicate
+  <br>-Furthermore, lower the prices which may product provider and customer paid for trading in on/offline traditional market platform and it should be done by cryptocurrency's ecosystem
+  <br>-And we also provide payment API for cryptocurrency, so other market platform operator could utilize cryptocurrency as payment method easily
+  <br>-In summery, our main vision is providing real-life platform in which many people can easily utilize cryptocurrency for their benefits and values
+  <br><br>
+  <h1>3. Value Proposition of SOT Platform</h1>
+  1) Provider
+  <br>-Reduce commission for using open market platforms and VAN services that's in centralized management and give chances to get more competitive prices policy for customer by cryptocurrency
+  <br>-Shift the boundary of provider to personal easily. Anybody who could serve their talent or product can open their shops without complicate progress of setting payment services because cryptocurrency is decentralized service for human and don't need any approval process from someone
+  <br>-Provider could integrate SOT payment S/W tools(API) in their previous system by code snippet and etc, so they could give cryptocurrency based payment service to customer easily
+  <br>-Provider who register their product using SOT platform can trace, analyze product and selling history beyond the market places because all information is under Ethereum blockchain platform and it will give more chances improving and maximizing revenue
+  <br>
+  2) Consumer
+  <br>-Reduce cost that's from management and distribution process of finance service or platform usage fees.All additional cost will be charged to customer include marketing cost too. Our platform will remove unnecessary money by removing traditional finace service and adoping P2P based exchange service (approx. min 10~15% or more)
+  <br>-Could use the safest payment in the world-More chances to buy many kinds of goods and cheap items by cryptocurrency
+  <br>-Consumer could sell their product easily in reverse. In SOT platform, every member could register their product and also buy items too. Look around, there are many precious items for other people which include new & old product and your talent, one-day-house for traveller
+  <br>-All buying history will be stored in blockchain and customer also can trace, analyze thier buying pattern and costs too. It makes customer doing more efficient payment
+  <br><br>
+  <h1>4. Roadmap</h1>
+  1) Until 2nd Quarter of 2018
+  <br>- Complete White paper (~Feb)
+  <br>- Launch ICO (~May)
+  <br>- Develop & Launch SOT shopping mall based on ERC20 Token of Ethereum (~Jun)
+  <br>. Provider and Consumer can register their product and buy it using SOT Token
+  <br>. Global user could use this service too but main target would be Korea first for marketing purpose
+  <br>2) Until 4th Quarter of 2018
+  <br>- Launch nationwide affiliation program of SOT Token with major on/offline shopping mall operators in Korea
+  <br>- Develop & Launch SOT payment API and implement in affiliator's market platform
+  <br>3) Until 2nd Quarter of 2019
+  <br>- Extend shopping mall coverage from Korea to Abroad (Shopping Category will be customized according to the Global Market Characteristic)
+</div>

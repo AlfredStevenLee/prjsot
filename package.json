@@ -1,0 +1,8 @@
+{
+  "name": "express_sot_project",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "~4.16.0",
+    "ejs": "~2.4.2"
+  }
+}

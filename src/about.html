@@ -4,5 +4,16 @@
 </head>
 <body>
   <h2>This is about html</h2>
+
+  <%=title%><br>
+  <%=length%><br><br>
+  
+  <%
+    for(var i=0; i<result.length; i++) {
+      var row = result[i];
+  %>
+      <p style="font-size: 0.4em"><%=row.email%> / <%=row.password%> / <%=row.name%> / <%=row.logdate%> </p>
+  <% } %>
+
 </body>
 </html>

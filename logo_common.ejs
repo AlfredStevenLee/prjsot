@@ -1,7 +1,19 @@
 
 <header id="header" style="position: -webkit-sticky; position: sticky;  top: 0; background: #ffffff; z-index:100; ">
   <a href="/sotmain" class="logo" style=""><H2>SOT Market</H2></a>
-  <div class="register" style="text-align:right;padding-top: 35px"><a href ="/register_member" style="">Register</a></div>
+
+
+
+  <div class="register" style="text-align:right;padding-top: 35px">
+    
+    <% if (req.session.login) { %>
+      member : <%= req.session.member_email %> / <a href="#" onclick="submit_logout()"> Log out </a>
+    <% } else { %>
+        <a href="/login_member"> Log in </a> / <a href ="/register_member" style=""> Register </a>
+    <% } %>
+
+  </div>
+
   <!--ul class="icons">
     <li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
     <li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>

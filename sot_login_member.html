@@ -29,19 +29,17 @@
 							<!-- Section -->
 								<section>
 									<header class="major">
-										<h2>Register</h2>
+										<h2>Login</h2> <%= req.session.login %>
 									</header>
 									<div class="features">
 										<article>
 											<!--span class="icon fa-diamond"></span-->
 											<div class="content">
-												<div id = "regist_form">
-													<form id="member_regist_form">
+												<div id = "login_form">
+													<form id="member_login_form">
 														email : <input type="text" name="member_email" id="member_email" data-validation="required email length" data-validation-length="max50"> </br>
-														password : <input type="password" name="member_password_confirmation" id="conf_password" data-validation="required length" data-validation-length="min8"> </br>
-														confirm-password : <input type="password" name="member_password" id="member_password" data-validation="confirmation"> </br>
-														name : <input type="text" name="member_name" id="member_name"> </br>
-														<input type="submit" id="member_regist" value="Register">
+														password : <input type="password" name="member_password" id="member_password" data-validation="required length" data-validation-length="min8"> </br>
+														<input type="submit" id="member_regist" value="Login">
 												</form>
 												</div>
 
@@ -66,28 +64,36 @@
 
 	<script>
 		$.validate({
-	    form : '#member_regist_form',
+	    form : '#member_login_form',
 	    modules : 'security',
 	    onSuccess : function($form) {
 	      //alert('The form '+$form.attr('id')+' is valid!');
-				submit_member();
+				submit_login();
 				return false;
 	    }
 	  });
 
 
-		function submit_member() {
-			var addr = "/action_register_member";
+		function submit_login() {
+			var addr = "/action_login_member";
 			var email = $("#member_email").val();
 			$.post(addr,
 			{
 				member_email : $("#member_email").val(),
-				member_password : $("#member_password").val(),
-				member_name : $("#member_name").val()
+				member_password : $("#member_password").val()
 			},
 			function(data, status){
 				if(status == "success"){
-					$("#regist_form").html("Regist OK! <br> Thank you for registration. <br> your email is "+email+". we sent confirmation email to you.");
+					//$("#regist_form").html("Regist OK! <br> Thank you for registration. <br> your email is "+email+". we sent confirmation email to you.");
+					if (data == "LOGIN_SUCCESS")
+					{
+						$("#member_login_form").html("Login Success");
+						window.location.replace("/sotmain");
+					}
+					else
+					{
+						$("#member_login_form").html("Login Failed");
+					}
 				} else {
 					alert("There's some problem . Please try it in seconds.");
 				}

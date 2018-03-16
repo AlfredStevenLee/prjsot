@@ -13,3 +13,30 @@
 <script src="js/util.js"></script>
 <!--[if lte IE 8]><script src="js/ie/respond.min.js"></script><![endif]-->
 <script src="js/main.js"></script>
+
+<!--jQuery form validator 사용 : http://www.formvalidator.net-->
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
+
+
+<script>
+function submit_logout() {
+  var addr = "/action_logout_member";
+
+  $.post(addr,
+  function(data, status){
+    if(status == "success"){
+      if (data == "LOGOUT_SUCCESS")
+      {
+        //alert("Logout success!");
+        window.location.replace("/sotmain");
+      }
+      else
+      {
+        //Anything need to do when login failed
+      }
+    } else {
+      alert("There's some problem . Please try it in seconds.");
+    }
+  });
+}
+</script>

@@ -4,9 +4,16 @@
 
       <!-- Search -->
         <section id="search" class="alt">
-          <form method="post" action="#">
+          <!--form method="post" action="#">
             <input type="text" name="query" id="query" placeholder="Search" />
-          </form>
+          </form-->
+          <% if (req.session.login) { %>
+            <%= req.session.member_email %> </br>
+            <a href="#" onclick="submit_logout()"> Log out </a>
+          <% } else { %>
+              <a href="/login_member"> Log in </a>
+          <% } %>
+
         </section>
 
       <!-- Menu -->
@@ -85,4 +92,3 @@
 
     </div>
   </div>
-  

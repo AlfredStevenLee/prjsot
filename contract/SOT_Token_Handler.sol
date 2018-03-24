@@ -105,9 +105,9 @@ contract SOT_Token is StandardToken { // CHANGE THIS. Update the contract name.
     // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function SOT_Token() {
-        balances[msg.sender] = 10000 * 1000000000000000000;               // Give the creator all initial tokens. This is set to 1000 for example. If you want your initial tokens to be X and your decimal is 5, set this value to X * 100000. (CHANGE THIS)
+        balances[msg.sender] = 10000 * 1000000000000000000;          // Give the creator all initial tokens. This is set to 1000 for example. If you want your initial tokens to be X and your decimal is 5, set this value to X * 100000. (CHANGE THIS)
         //balances[msg.sender] = 10000 * 1000000000000000000         // 1만개발행
-        totalSupply = 10000 * 1000000000000000000;                        // Update total supply (1000 for example) (CHANGE THIS)
+        totalSupply = 10000 * 1000000000000000000;                   // Update total supply (1000 for example) (CHANGE THIS)
         name = "Shopping and Trading Token based on Ethereum";       // Set the name for display purposes (CHANGE THIS)
         decimals = 18;                                               // Amount of decimals for display purposes (CHANGE THIS)
         symbol = "SOT";                                              // Set the symbol for display purposes (CHANGE THIS)

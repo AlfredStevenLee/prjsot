@@ -50,7 +50,7 @@ exports.login_member = function(req, res) {
     }
 
     //Make Query
-    var sql = "select email from member where email = ? and password = ?";
+    var sql = "select id, email from member where email = ? and password = ?";
     var param = req.body;
 
     //console.log(">> login proceeding : "+param.member_email+" / "+param.member_password);
@@ -79,7 +79,8 @@ exports.login_member = function(req, res) {
 
         //register user data in session
         var session = req.session;
-        session.member_email = param.member_email;
+        session.member_id = rows[0].id;
+        session.member_email = rows[0].email;
         session.login = true;
         //console.log(">> get login data from session: "+session.login);
         res.send("LOGIN_SUCCESS");

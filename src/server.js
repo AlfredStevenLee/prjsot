@@ -1,6 +1,7 @@
 var express = require('express');
 var bp = require('body-parser');
 var session = require('express-session');
+var multer = require('multer');
 
 var app = express();
 
@@ -13,6 +14,7 @@ app.use(session({
 
 app.use(bp.urlencoded({extended: true}));
 app.use(bp.json());
+
 
 app.set('views', __dirname);
 app.set('view engine', 'ejs');

@@ -47,7 +47,10 @@
 														Price(ETH) : <input type="text" name="prod_price_eth" id="prod_price_eth"> </br>
 														Logistics Y/N : <input type="radio" name="prod_logis_yn" id="prod_logis_y" value="Y"> <label for="prod_logis_y">Yes</label> / <input type="radio" name="prod_logis_yn" id="prod_logis_n" value="N" checked><label for="prod_logis_n">No</label> </br>
 														Activation Y/N : <input type="radio" name="prod_active_yn" id="prod_active_y" value="Y" checked> <label for="prod_active_y">Yes</label> / <input type="radio" name="prod_active_yn" id="prod_active_n" value="N" ><label for="prod_active_n">No</label> </br>
-														Description : <textarea name="prod_desc" id="prod_desc" data-validation="required length" data-validation-length="min8"></textarea> </br>
+														<!-- Description : <textarea name="prod_desc" id="prod_desc" data-validation="required length" data-validation-length="min8"></textarea> </br> -->
+														<button type="button" class="fit" onclick='openEditor()'>Edit Product Description</button>
+														<input type="hidden" name="prod_desc" id="prod_desc" value="null">
+														<div id="prod_preview" class="box" style="overflow:scroll;height:300px">Preview Product Description</div>
 														<input type="submit" id="product_regist" value="Register">
 													</form>
 												</div>
@@ -109,7 +112,10 @@
 					$("#regist_form").html("Product Regist OK! <br> Thank you for product registration.");
 				}
 			});
+		}
 
+		function openEditor() {
+			window.open("/editor","editorWindow","width=500, height=400, scrollbars=yes, resizable=yes, toolbar=no");
 		}
 
 	</script>

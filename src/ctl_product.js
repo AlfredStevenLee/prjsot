@@ -64,5 +64,18 @@ exports.register_product = function(req, res) {
       connection.release();
     })
   })
+};
+
+
+
+exports.register_product_edit_image = function(req, res) {
+
+  //console.log(">>>>> req : "+param.prod_name);
+  //console.log(">>>>> file path : "+req.file.path);
+  //console.log(">>>>> file name : "+req.file.filename);
+
+  var prod_img_name = (!req.file) ? "null" : "/uploads/"+req.file.filename;
+
+  res.send(prod_img_name);
 
 };

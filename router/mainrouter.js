@@ -24,6 +24,9 @@ module.exports = function(app)
   app.get('/sotmain', function(req, res){
     res.render('../sot_main.html', {req : req, res : res});
   });
+  app.get('/editor', function(req, res){
+    res.render('../editor.html', {req : req, res : res});
+  });
 
   app.get('/dbtest', require("../src/ctl_dbtest").test); //Router 파일이 있는 위치 기준으로 컨트롤러 파일 경로를 써줌
 
@@ -41,8 +44,11 @@ module.exports = function(app)
 
   app.post('/action_login_member', require("../src/ctl_member").login_member);
 
-  //file upload시 코딩 패턴
+  //상품대표이미지 등록 : file upload시 코딩 패턴
   app.post('/action_register_product', upload.single('prod_img'), require("../src/ctl_product").register_product);
+
+  //상품설명이미지 등록 : summernote에서 발송
+  app.post('/action_edit_product_image', upload.single('imagefile'), require("../src/ctl_product").register_product_edit_image);
 
   app.get('/register_product', function(req, res){
 

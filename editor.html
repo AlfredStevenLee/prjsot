@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Description Editor</title>
+  <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script>
+  <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>
+</head>
+<body>
+
+  <textarea id="summernote">- Edit Product Description in here -</textarea>
+	<input type="hidden" id="prod_desc" value="null">
+	<button type="button" onclick="editDone()">Done</button>
+
+  <script>
+    $(document).ready(function() {
+				$('#summernote').summernote({
+				  height: 300,                 // set editor height
+				  minHeight: null,             // set minimum height of editor
+				  maxHeight: null,             // set maximum height of editor
+				  focus: true                  // set focus to editable area after initializing summernote
+				});
+
+				prod_desc_val = $('#prod_desc', parent.opener.document).val();
+				if (prod_desc_val != "null") {
+					$('#summernote').summernote('code', prod_desc_val);
+					$('#prod_desc').val(prod_desc_val);
+				}
+    });
+
+		function editDone() {
+			$('#prod_preview', parent.opener.document).html( $('#summernote').summernote('code') );
+			$('#prod_desc', parent.opener.document).val( $('#summernote').summernote('code') );
+			window.close();
+		}
+
+		$('#summernote').summernote({
+		  callbacks: {
+		    onImageUpload: function(files) {
+		      // upload image to server and create imgNode...
+					//alert(files.value);
+					for (var i = files.length - 1; i >= 0; i--) {
+          	sendFile(files[i]);
+          }
+					//var imgNode = document.createElement('img');
+		      //$summernote.summernote('insertNode', imgNode);
+		    }
+		  }
+		});
+
+		function sendFile(file) {
+      var form_data = new FormData();
+      form_data.append('imagefile', file);
+      $.ajax({
+        data: form_data,
+        type: "POST",
+        url: '/action_edit_product_image',
+        cache: false,
+        contentType: false,
+        enctype: 'multipart/form-data',
+        processData: false,
+        success: function(dataUrlPath) {
+					//result = "http://127.0.0.1:8080"+dataUrlPath;
+					alert(dataUrlPath);
+          $('#summernote').summernote('insertImage', dataUrlPath);
+          //$('#imageBoard > ul').append('<li><img src="'+dataUrlPath+'" width="480" height="auto"/></li>');
+        }
+      });
+    }
+
+
+  </script>
+
+</body>
+</html>

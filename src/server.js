@@ -27,3 +27,4 @@ var server = app.listen(8080, function(){
 });
 
 app.use(express.static('../public'));
+app.use('/uploads',express.static('../uploads'));

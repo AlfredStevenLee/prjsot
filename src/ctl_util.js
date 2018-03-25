@@ -5,12 +5,22 @@ var dbpool = require("./dbcon").pool;
 //아래와 같이 export를 통해 하나씩 메소드를 지정하고 그 내부에서 렌더링 할 파일로 redirection하면서 결과값을 함게 보내 줌
 
 exports.checkNullNumber = function(val) {
-  console.log("check1 > "+val);
+  //console.log("check1 > "+val);
   if (!val) {
-    console.log("check1-1 > val is null");
+    //console.log("check1-1 > val is null");
     val = 0;
   }
-  console.log("check2 >"+val+"<");
+  //console.log("check2 >"+val+"<");
+  return val;
+};
+
+exports.checkNullString = function(val) {
+  //console.log("check1 > "+val);
+  if (!val) {
+    //console.log("check1-1 > val is null");
+    val = "null";
+  }
+  //console.log("check2 >"+val+"<");
   return val;
 };
 

@@ -45,7 +45,7 @@
 							<!-- Section -->
 								<section>
 									<header class="major">
-										<h2>SOT New Brand Arrived for Spring!</h2>
+										<h2>Section #2</h2>
 									</header>
 									<div class="features">
 										<article>
@@ -84,27 +84,59 @@
 									<header class="major">
 										<h2>New Products</h2>
 									</header>
-
 									<div class="posts">
-
-										<% for(var i=0; i < prod_list.length; i++ ) { %>
-
-											<article>
-												<a href="javascript:view_prod_detail('<%- prod_list[i].id %>')" class="image">
-												<% if(prod_list[i].img_url == "null") { %>
-													<img src="/uploads/def_prod_img.png" alt="" />
-												<% } else { %>
-													<img src="/uploads/<%-prod_list[i].img_url%>" alt="" />
-												<% } %>
-											  </a>
-												<p> <%- prod_list[i].prod_name %> </p>
-												<span><%- prod_list[i].price_krw %></span>
-												<div>구매 1300</div>
-											</article>
-
-										<% } %>
+										<article>
+											<a href="#" class="image"><img src="images/pic01.jpg" alt="" /></a>
+											<h3>Interdum aenean</h3>
+											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+											<ul class="actions">
+												<li><a href="#" class="button">More</a></li>
+											</ul>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="images/pic02.jpg" alt="" /></a>
+											<h3>Nulla amet dolore</h3>
+											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+											<ul class="actions">
+												<li><a href="#" class="button">More</a></li>
+											</ul>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="images/pic03.jpg" alt="" /></a>
+											<h3>Tempus ullamcorper</h3>
+											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+											<ul class="actions">
+												<li><a href="#" class="button">More</a></li>
+											</ul>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="images/pic04.jpg" alt="" /></a>
+											<h3>Sed etiam facilis</h3>
+											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+											<ul class="actions">
+												<li><a href="#" class="button">More</a></li>
+											</ul>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="images/pic05.jpg" alt="" /></a>
+											<h3>Feugiat lorem aenean</h3>
+											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+											<ul class="actions">
+												<li><a href="#" class="button">More</a></li>
+											</ul>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="images/pic06.jpg" alt="" /></a>
+											<h3>Amet varius aliquam</h3>
+											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+											<ul class="actions">
+												<li><a href="#" class="button">More</a></li>
+											</ul>
+										</article>
 									</div>
- 							</section>
+								</section>
+
+						</div>
 					</div>
 
 				<!-- 왼쪽 사이드바 include 부분 -->
@@ -112,14 +144,6 @@
 
 			</div>
 
-			<script>
-
-				function view_prod_detail(prod_id) {
-					//alert("선택상품코드 : "+prod_id);
-					window.location.href = "/sot_view_product?prod_id="+prod_id;
-				}
-
-			</script>
 
 	</body>
 </html>

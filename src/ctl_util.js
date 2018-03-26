@@ -76,5 +76,4 @@ exports.prod_category = function(req, res, default_val, callback) {
 
     });
   });
-
 };

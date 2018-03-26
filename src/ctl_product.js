@@ -66,8 +66,7 @@ exports.register_product = function(req, res) {
   })
 };
 
-
-
+//상품 설명 작성시 이미지 업로드하는 부분
 exports.register_product_edit_image = function(req, res) {
 
   //console.log(">>>>> req : "+param.prod_name);
@@ -78,4 +77,127 @@ exports.register_product_edit_image = function(req, res) {
 
   res.send(prod_img_name);
 
+};
+
+
+exports.prod_list = function(req, res, callback) {
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      console.log(">> can't get sql connection!");
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "select id, prod_name, img_url, price_krw, price_sot, price_eth from product where active_yn = 'Y' ";
+
+    //Execute SQL
+    connection.query(sql, function(err_sql, rows)
+    {
+      //var result_str = "";
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql");
+        throw err;
+      }
+
+      //Release connection
+      connection.release();
+      callback(null, rows);
+
+    });
+  });
+};
+
+
+exports.prod_view = function(req, res, callback) {
+  var prod_id = req.query.prod_id;
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      console.log(">> can't get sql connection!");
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "select a.id, cat_id, b.cd_val 'cat_name', prod_name, img_url, price_krw, price_sot, price_eth, ";
+    sql += "description, logistics_yn, active_yn, register_id 'seller_id', c.email 'seller_email', c.name 'seller_name' ";
+    sql += "from product a, code b, member c ";
+    sql += "where a.id = ? and a.cat_id = b.cd and b.cd_group = 'PROD_CAT' and c.id = a.register_id ";
+
+    //console.log(">> prod selected : "+prod_id);
+    //Execute SQL
+    connection.query(sql, prod_id, function(err_sql, rows)
+    {
+      //var result_str = "";
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql");
+        throw err;
+      }
+
+      //Release connection
+      connection.release();
+      callback(null, rows);
+
+    });
+  });
+};
+
+
+exports.buy_product = function(req, res) {
+  var param = req.body;
+
+  var prod_id = param.prod_id;
+  var buyer_id = req.session.member_id;
+
+  //console.log(">> prod id : "+JSON.stringify(param)+" / "+param.prod_id);
+  //console.log(">> buyer id : "+buyer_id);
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "insert into contract ";
+    sql += "select null, a.id, a.register_id, b.id, 'contract#', 'seller#', 'buyer#', a.price_krw, a.price_sot, a.price_eth, 'REG', 0, null, now() ";
+    sql += " from product a, member b ";
+    sql += " where a.id = ? and b.id = ?";
+    //var param = req.body;
+    //console.log(">> start register");
+
+    //Execute SQL
+    connection.query(sql, [prod_id, buyer_id] , function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : "+err_sql);
+        throw err;
+      }
+
+      //Send result & Redirect to view. Something have to be sent back
+      res.send("RESIGT_SUCCESS");
+
+      //Release connection
+      connection.release();
+    });
+  });
 };

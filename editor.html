@@ -18,10 +18,21 @@
   <script>
     $(document).ready(function() {
 				$('#summernote').summernote({
-				  height: 300,                 // set editor height
+				  height: 270,                 // set editor height
 				  minHeight: null,             // set minimum height of editor
 				  maxHeight: null,             // set maximum height of editor
-				  focus: true                  // set focus to editable area after initializing summernote
+				  focus: true,                 // set focus to editable area after initializing summernote
+					callbacks: {
+				    onImageUpload: function(files) {
+				      // upload image to server and create imgNode...
+							//alert(files.value);
+							for (var i = files.length - 1; i >= 0; i--) {
+		          	sendFile(files[i]);
+		          }
+							//var imgNode = document.createElement('img');
+				      //$summernote.summernote('insertNode', imgNode);
+				    }
+				  }
 				});
 
 				prod_desc_val = $('#prod_desc', parent.opener.document).val();
@@ -37,6 +48,7 @@
 			window.close();
 		}
 
+		/*
 		$('#summernote').summernote({
 		  callbacks: {
 		    onImageUpload: function(files) {
@@ -50,6 +62,7 @@
 		    }
 		  }
 		});
+		*/
 
 		function sendFile(file) {
       var form_data = new FormData();

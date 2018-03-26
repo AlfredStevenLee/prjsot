@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+
+		<!-- 공용 header 삽입 부 -->
+		<% include ./head_common.ejs %>
+
+	</head>
+
+
+	<body>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+							<% include ./logo_common.ejs %>
+
+							<!-- Section -->
+								<section>
+									<header class="major">
+										<h2>Product list</h2>
+									</header>
+
+									<div class="posts">
+
+										<% for(var i=0; i < prod_list.length; i++ ) { %>
+
+											<article>
+												<a href="javascript:view_prod_detail('<%- prod_list[i].id %>')" class="image">
+												<% if(prod_list[i].img_url == "null") { %>
+													<img src="/uploads/def_prod_img.png" alt="" />
+												<% } else { %>
+													<img src="/uploads/<%-prod_list[i].img_url%>" alt="" />
+												<% } %>
+											  </a>
+												<p> <%- prod_list[i].prod_name %> </p>
+												<span><%- prod_list[i].price_krw %></span>
+												<div>구매 1300</div>
+											</article>
+
+										<% } %>
+  						   </div>
+							</section>
+					</div>
+
+				<!-- 왼쪽 사이드바 include 부분 -->
+				<% include ./sidebar_common.ejs %>
+
+			</div>
+
+			<script>
+
+				function view_prod_detail(prod_id) {
+					//alert("선택상품코드 : "+prod_id);
+					window.location.href = "/sot_view_product?prod_id="+prod_id;
+				}
+
+			</script>
+
+	</body>
+</html>

@@ -36,8 +36,9 @@
 											<!--span class="icon fa-diamond"></span-->
 											<div class="content">
 												<div id = "regist_form">
-													<form id="product_regist_form" enctype="multipart/form-data">
 
+													<form id="product_regist_form" enctype="multipart/form-data">
+														
 														<% /* -로 출력하면 escape문자를 처리안하고 =로 출력하면 escape로 출력함. 꺽쇠가 &lt로 보이게 됨 */ %>
 														Category : <select name="prod_cat" id="prod_cat" data-validation="required"><%- prod_category %></select> </br>
 														Product Name : <input type="text" name="prod_name" id="prod_name" data-validation="required length" data-validation-length="min4"> </br>
@@ -52,7 +53,9 @@
 														<input type="hidden" name="prod_desc" id="prod_desc" value="null">
 														<div id="prod_preview" class="box" style="overflow:scroll;height:300px">Preview Product Description</div>
 														<input type="submit" id="product_regist" value="Register">
+
 													</form>
+
 												</div>
 
 											</div>

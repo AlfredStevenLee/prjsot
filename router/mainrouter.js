@@ -18,12 +18,66 @@ module.exports = function(app)
   app.get('/', function(req, res){
     res.render('sot_index.html', {req : req, res : res});
   });
+
   app.get('/about', function(req, res){
     res.render('about.html', {req : req, res : res});
   });
-  app.get('/sotmain', function(req, res){
-    res.render('../sot_main.html', {req : req, res : res});
+
+
+  app.get('/sot_view_product', function(req, res){
+
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").prod_view(req, res, function(err, data){
+          callback(null, data);
+        });
+      }
+    ],function(err, results) {
+        //res.render('../sot_register_product.html', {req : req, res : res, common_util : results[0], common_util2 : results[1]});
+        res.render('../sot_view_product.html', {req : req, res : res, prod_detail : results[0] });
+      }
+    );
   });
+
+
+  app.get('/sotmain', function(req, res){
+
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").prod_list(req, res, function(err, data){
+          callback(null, data);
+        });
+      }
+    ],function(err, results) {
+        //res.render('../sot_register_product.html', {req : req, res : res, common_util : results[0], common_util2 : results[1]});
+        res.render('../sot_main.html', {req : req, res : res, prod_list : results[0] });
+      }
+    );
+  });
+
+
+  app.get('/sot_product_list', function(req, res){
+
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").prod_list(req, res, function(err, data){
+          callback(null, data);
+        });
+      }
+    ],function(err, results) {
+        //res.render('../sot_register_product.html', {req : req, res : res, common_util : results[0], common_util2 : results[1]});
+        res.render('../sot_product_list.html', {req : req, res : res, prod_list : results[0] });
+      }
+    );
+  });
+
+
   app.get('/editor', function(req, res){
     res.render('../editor.html', {req : req, res : res});
   });
@@ -75,6 +129,7 @@ module.exports = function(app)
   });
 
 
+  app.post('/action_buy_product', require("../src/ctl_product").buy_product);
 
 
 

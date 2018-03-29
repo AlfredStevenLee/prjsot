@@ -38,6 +38,40 @@ exports.register_member = function(req, res) {
   })
 };
 
+exports.register_bizinfo = function(req, res) {
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "insert into provider values(null,?,?,?,?,?,?,?,now())";
+    var param = req.body;
+    //console.log(">> start register");
+
+    //Execute SQL
+    connection.query(sql, [param.provider_name, param.description, param.contact_phone, param.contact_address, param.biz_regist_no, param.payment_wallet_addr, req.session.member_id] , function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql");
+        throw err;
+      }
+      //Send result & Redirect to view. Something have to be sent back
+      res.send("RESIGT_SUCCESS");
+
+      //Release connection
+      connection.release();
+    })
+  })
+};
+
 exports.login_member = function(req, res) {
 
   //getConnection

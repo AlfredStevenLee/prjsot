@@ -131,10 +131,10 @@ exports.prod_view = function(req, res, callback) {
     }
 
     //Make Query
-    var sql = "select a.id, cat_id, b.cd_val 'cat_name', prod_name, img_url, price_krw, price_sot, price_eth, ";
-    sql += "description, logistics_yn, active_yn, register_id 'seller_id', c.email 'seller_email', c.name 'seller_name' ";
-    sql += "from product a, code b, member c ";
-    sql += "where a.id = ? and a.cat_id = b.cd and b.cd_group = 'PROD_CAT' and c.id = a.register_id ";
+    var sql = "select a.id, a.cat_id, b.cd_val 'cat_name', a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, ";
+    sql += "a.description, a.logistics_yn, a.active_yn, a.register_id 'seller_id', c.email 'seller_email', c.name 'seller_name', d.payment_wallet_addr ";
+    sql += "from product a, code b, member c, provider d ";
+    sql += "where a.id = ? and a.cat_id = b.cd and b.cd_group = 'PROD_CAT' and c.id = a.register_id and d.register_id = a.register_id ";
 
     //console.log(">> prod selected : "+prod_id);
     //Execute SQL
@@ -144,7 +144,7 @@ exports.prod_view = function(req, res, callback) {
       if (err_sql)
       {
         connection.release();
-        console.log(">> error from sql");
+        console.log(">> error from sql : prod_view : "+err_sql);
         throw err;
       }
 
@@ -161,6 +161,8 @@ exports.buy_product = function(req, res) {
   var param = req.body;
 
   var prod_id = param.prod_id;
+  var buyer_account = param.buyer_account;
+  var contract_address = param.contract_address;
   var buyer_id = req.session.member_id;
 
   //console.log(">> prod id : "+JSON.stringify(param)+" / "+param.prod_id);
@@ -177,14 +179,14 @@ exports.buy_product = function(req, res) {
 
     //Make Query
     var sql = "insert into contract ";
-    sql += "select null, a.id, a.register_id, b.id, 'contract#', 'seller#', 'buyer#', a.price_krw, a.price_sot, a.price_eth, 'REG', 0, null, now() ";
-    sql += " from product a, member b ";
-    sql += " where a.id = ? and b.id = ?";
+    sql += "select null, a.id, a.register_id, b.id, ?, c.payment_wallet_addr, ?, a.price_krw, a.price_sot, a.price_eth, 'REG', 0, null, now() ";
+    sql += " from product a, member b, provider c ";
+    sql += " where a.id = ? and b.id = ? and c.register_id = a.register_id";
     //var param = req.body;
     //console.log(">> start register");
 
-    //Execute SQL
-    connection.query(sql, [prod_id, buyer_id] , function(err_sql, rows)
+    //Execute SQL : save contract info to db
+    connection.query(sql, [contract_address, buyer_account, prod_id, buyer_id] , function(err_sql, rows)
     {
       if (err_sql)
       {
@@ -193,11 +195,23 @@ exports.buy_product = function(req, res) {
         throw err;
       }
 
-      //Send result & Redirect to view. Something have to be sent back
-      res.send("RESIGT_SUCCESS");
+      //get contract no and return it
+      sql = "select max(id) cur_id from contract where buyer_id = ?";
+      connection.query(sql, [buyer_id] , function(err_sql, rows)
+      {
+        if (err_sql)
+        {
+          connection.release();
+          console.log(">> error from sql : "+err_sql);
+          throw err;
+        }
+        //send contract no
+        //console.log("contract id : "+rows[0].cur_id);
+        res.send((rows[0].cur_id).toString());
 
-      //Release connection
-      connection.release();
+        //Release connection
+        connection.release();
+      });
     });
   });
 };

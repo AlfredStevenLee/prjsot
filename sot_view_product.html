@@ -56,8 +56,16 @@
 														<input type="button" id="product_buy" value="Buy this" onclick="buy_product(<%-prod_detail[0].id%>)"> <input type="button" id="product_add_fav" value="Add to favorite" onclick="add_product_fav(<%-prod_detail[0].id%>)">
 
 													</form>
-
+													<div id="ct">here ############################</div>
 												</div>
+
+												<input type="hidden" id="member_id" value="<%-req.session.member_id%>">
+												<input type="hidden" id="prod_id" value="<%-prod_detail[0].id%>">
+												<input type="hidden" id="seller_id" value="<%-prod_detail[0].seller_id%>">
+												<input type="hidden" id="seller_account" value="<%-prod_detail[0].payment_wallet_addr%>">
+												<input type="hidden" id="price_krw" value="<%-prod_detail[0].price_krw%>">
+												<input type="hidden" id="price_sot" value="<%-prod_detail[0].price_sot%>">
+												<input type="hidden" id="price_eth" value="<%-prod_detail[0].price_eth%>">
 
 											</div>
 										</article>
@@ -78,25 +86,137 @@
 
   <!--자바스크립트 기입부-->
 
+	<script type="text/javascript" src="https://github.com/ethereum/web3.js/tree/develop/dist/web3.min.js"></script>
+
 	<script>
+
+		var contractAddress = '0x9c8cfba70716e78f7d188fd8d751f3c0e267a8ab';
+		var abi = [ { "constant": false, "inputs": [ { "name": "contract_no", "type": "uint32" }, { "name": "prod_id", "type": "uint32" }, { "name": "seller_account", "type": "address" }, { "name": "prod_price_sot", "type": "uint32" } ], "name": "addProductContract", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "val", "type": "uint256" } ], "name": "approve", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "from", "type": "address" }, { "name": "to", "type": "address" }, { "name": "val", "type": "uint256" } ], "name": "sendToken", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "to", "type": "address" }, { "name": "val", "type": "uint256" } ], "name": "sendTokenDirect", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "constant": true, "inputs": [ { "name": "contract_no", "type": "uint32" } ], "name": "getProductContract", "outputs": [ { "name": "", "type": "uint32" }, { "name": "", "type": "address" }, { "name": "", "type": "address" }, { "name": "", "type": "uint32" }, { "name": "", "type": "bytes5" }, { "name": "", "type": "bool" }, { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" } ];
+
 
 		function buy_product(buy_prod_id) {
 
-			checkBrowser();
+			//web3 브라우저 여부 체크
+			if (typeof web3 !== 'undefined') {
+				// Use Mist/MetaMask's provider
+				window.web3 = new Web3(web3.currentProvider);
+			} else {
+				alert('No web3? You should consider trying MetaMask!');
+				// fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+				window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+				return false;
+			}
 
+			//metamsk 로그인 여부 체크
+			var myAccount = web3.eth.accounts[0];
+			if (typeof myAccount == 'undefined') {
+				alert('Please unlock metamask first');
+				return false;
+			}
+
+			//metamask network 체크. Dev mode require ropsten. change this to case 1 for commercial mode
+			web3.version.getNetwork((err, netId) => {
+				var nwstat = false;
+
+			  switch (netId) {
+			    case "1":
+			      //	alert('This is mainnet')
+			      break
+			    case "2":
+			      //alert('This is the deprecated Morden test network.')
+			      break
+			    case "3":
+			      //alert('This is the ropsten test network.')
+						nwstat = true;
+			      break
+			    case "4":
+			      //alert('This is the Rinkeby test network.')
+			      break
+			    case "42":
+			      //alert('This is the Kovan test network.')
+			      break
+			    default:
+			      //alert('This is an unknown network.')
+			  }
+
+				if(!nwstat) {
+					alert("Please use main network!");
+					return false;
+				} else {
+					doBuyProduct(buy_prod_id);
+				}
+			});
+		}
+
+		function doBuyProduct(buy_prod_id){
+
+			$("#detail_form").html("<span style='color:red'>Now registering... wait a minute!</span>");
+
+			//1. save to MySQL DB
 			var addr = "/action_buy_product";
+			var buyerAccount = web3.eth.accounts[0]; //get user account
 
 			$.post(addr,
 			{
-				prod_id:buy_prod_id
+				prod_id:buy_prod_id,
+				buyer_account:buyerAccount,
+				contract_address:contractAddress
 			},
-			function(data, status){
+			function(prod_contract_no, status){
 				if(status == "success"){
-					$("#detail_form").html("Product purchased");
+					$("#detail_form").html("<span style='color:red'>Product saved in Database</span>");
+					//alert("prod_contract_no : "+prod_contract_no)
+					doBuyProductBlockChain(prod_contract_no);
 				} else {
 					alert("There's some problem . Please try it in seconds.");
 				}
 			});
+
+
+			//2. save to contract
+
+		}
+
+		function doBuyProductBlockChain(prod_contract_no) {
+			//alert("start bchain!");
+
+			var buyerAccount = web3.eth.accounts[0];
+			var contractSot = web3.eth.contract(abi);
+			var productManager = contractSot.at(contractAddress);
+
+			//var member_id = $("#member_id").val();
+			var prod_id = $("#prod_id").val();
+			//var seller_id = $("#seller_id").val();
+			var seller_account = $("#seller_account").val();
+			//var price_krw = $("#price_krw").val();
+			var price_sot = $("#price_sot").val();
+			//var price_eth = $("#price_eth").val();
+			var contract_no = prod_contract_no;
+			//var now = (new Date()).toString();
+
+			//alert(">>"+web3.currentProvider.constructor.name);
+			//alert(">>"+web3.currentProvider.isMetaMask);
+			//alert(member_id+"/"+prod_id+"/"+seller_id+"/"+seller_account+"/"+price_krw+"/"+price_sot+"/"+price_eth+"/"+contract_no+"/"+now);
+			//return false;
+
+			var txid;
+
+			productManager.addProductContract.sendTransaction(contract_no,prod_id,seller_account,price_sot,function(e,r){
+				txid = r;
+				$("#detail_form").html("<span style='color:green'>Product registration is proceeding...</span>");
+			});
+
+			var filter = web3.eth.filter('latest');
+		  filter.watch(function(e, r) {
+		    //getValue();
+		    web3.eth.getTransaction(txid, function(e,r){
+		      if (r != null && r.blockNumber > 0) {
+		        $("#detail_form").html("<span style='color:blue'>Product registration completed! Thank you.</span>");
+		        filter.stopWatching();
+		      }
+		   });
+		 });
+
 		}
 
 

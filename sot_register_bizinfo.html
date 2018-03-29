@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+
+		<!-- 공용 header 삽입 부 -->
+		<% include ./head_common.ejs %>
+
+
+	</head>
+
+
+	<body>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+							<% include ./logo_common.ejs %>
+
+							<!-- Section -->
+								<section>
+									<header class="major">
+										<h2>Register Biz Information</h2>
+									</header>
+									<div class="features">
+										<article>
+											<!--span class="icon fa-diamond"></span-->
+											<div class="content">
+												<div id = "regist_form">
+
+													<form id="member_regist_form">
+														Seller name : <input type="text" id="provider_name" data-validation="required length" data-validation-length="min2"> </br>
+														Introduction : <input type="text" id="description"> </br>
+														Contact phone no. : <input type="text" id="contact_phone" data-validation="required"> </br>
+														Contact address : <input type="text" id="contact_address"> </br>
+														Business registration no. : <input type="text" id="biz_regist_no"> </br>
+														Payment wallet account : <input type="text" id="payment_wallet_addr" value="**It will be set automatically**" disabled> </br>
+														<input type="submit" id="member_regist" value="Register">
+													</form>
+
+												</div>
+
+											</div>
+										</article>
+									</div>
+								</section>
+
+
+						</div>
+					</div>
+
+				<!-- 왼쪽 사이드바 include 부분 -->
+				<% include ./sidebar_common.ejs %>
+
+			</div>
+
+	</body>
+
+
+  <!--자바스크립트 기입부-->
+	<script type="text/javascript" src="https://github.com/ethereum/web3.js/tree/develop/dist/web3.min.js"></script>
+
+	<script>
+		$.validate({
+	    form : '#member_regist_form',
+	    modules : 'security',
+	    onSuccess : function($form) {
+	      //alert('The form '+$form.attr('id')+' is valid!');
+				checkWeb3();
+				return false;
+	    }
+	  });
+
+
+		function checkWeb3() {
+
+			//web3 브라우저 여부 체크
+			if (typeof web3 !== 'undefined') {
+				// Use Mist/MetaMask's provider
+				window.web3 = new Web3(web3.currentProvider);
+			} else {
+				alert('No web3? You should consider trying MetaMask!');
+				// fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+				window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+				return false;
+			}
+
+			//metamsk 로그인 여부 체크
+			var myAccount = web3.eth.accounts[0];
+			if (typeof myAccount == 'undefined') {
+				alert('Please unlock metamask first');
+				return false;
+			}
+
+			//metamask network 체크. Dev mode require ropsten. change this to case 1 for commercial mode
+			web3.version.getNetwork((err, netId) => {
+				var nwstat = false;
+
+			  switch (netId) {
+			    case "1":
+			      //	alert('This is mainnet')
+			      break
+			    case "2":
+			      //alert('This is the deprecated Morden test network.')
+			      break
+			    case "3":
+			      //alert('This is the ropsten test network.')
+						nwstat = true;
+			      break
+			    case "4":
+			      //alert('This is the Rinkeby test network.')
+			      break
+			    case "42":
+			      //alert('This is the Kovan test network.')
+			      break
+			    default:
+			      //alert('This is an unknown network.')
+			  }
+
+				if(!nwstat) {
+					alert("Please use main network!");
+					return false;
+				} else {
+					submit_member();
+				}
+			});
+		}
+
+
+		function submit_member() {
+			var wallet_account = web3.eth.accounts[0];
+			$("#payment_wallet_addr").val(wallet_account);
+
+			alert("Your selected wallet account is "+wallet_account+".\n Please note this again!");
+
+			var addr = "/action_register_bizinfo";
+
+			$.post(addr,
+			{
+				provider_name : $("#provider_name").val(),
+				description : $("#description").val(),
+				contact_phone : $("#contact_phone").val(),
+				contact_address : $("#contact_address").val(),
+				biz_regist_no : $("#biz_regist_no").val(),
+				payment_wallet_addr : $("#payment_wallet_addr").val()
+			},
+			function(data, status){
+				if(status == "success"){
+					$("#regist_form").html("Regist OK! <br> Thank you for registration. <br>You can sell your precious products from now.");
+				} else {
+					alert("There's some problem . Please try it in seconds.");
+				}
+			});
+		}
+
+	</script>
+
+</html>

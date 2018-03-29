@@ -88,6 +88,10 @@ module.exports = function(app)
     res.render('../sot_register_member.html', {req : req, res : res});
   });
 
+  app.get('/register_bizinfo', function(req, res){
+    res.render('../sot_register_bizinfo.html', {req : req, res : res});
+  });
+
   app.get('/login_member', function(req, res){
     res.render('../sot_login_member.html', {req : req, res : res});
   });
@@ -95,6 +99,8 @@ module.exports = function(app)
   app.post('/action_logout_member', require("../src/ctl_member").logout_member);
 
   app.post('/action_register_member', require("../src/ctl_member").register_member);
+
+  app.post('/action_register_bizinfo', require("../src/ctl_member").register_bizinfo);
 
   app.post('/action_login_member', require("../src/ctl_member").login_member);
 

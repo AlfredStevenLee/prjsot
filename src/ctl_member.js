@@ -63,6 +63,10 @@ exports.register_bizinfo = function(req, res) {
         console.log(">> error from sql");
         throw err;
       }
+
+      var session = req.session;
+      session.biz = true;
+
       //Send result & Redirect to view. Something have to be sent back
       res.send("RESIGT_SUCCESS");
 
@@ -84,7 +88,8 @@ exports.login_member = function(req, res) {
     }
 
     //Make Query
-    var sql = "select id, email from member where email = ? and password = ?";
+    //var sql = "select id, email from member where email = ? and password = ?";
+    var sql = "select a.id as id, a.email as email, b.id as biz from member a left outer join provider b on b.register_id = a.id where a.email = ? and a.password = ? ";
     var param = req.body;
 
     //console.log(">> login proceeding : "+param.member_email+" / "+param.member_password);
@@ -95,7 +100,7 @@ exports.login_member = function(req, res) {
       if (err_sql)
       {
         connection.release();
-        console.log(">> error from sql");
+        console.log(">> error from sql : member login");
         throw err;
       }
 
@@ -103,20 +108,24 @@ exports.login_member = function(req, res) {
       if(rows.length == 0)
       {
         //Login failed
-        //console.log(">> login fail");
+        console.log(">> login fail");
         res.send("LOGIN_FAIL");
       }
       else
       {
         //login success
-        //console.log(">> login success");
 
         //register user data in session
         var session = req.session;
         session.member_id = rows[0].id;
         session.member_email = rows[0].email;
         session.login = true;
-        //console.log(">> get login data from session: "+session.login);
+
+        if(rows[0].biz != null) {
+          //console.log("biz id : "+rows[0].biz);
+          session.biz = true;
+        }
+
         res.send("LOGIN_SUCCESS");
       }
 

@@ -67,7 +67,6 @@
 
 
   <!--자바스크립트 기입부-->
-	<script type="text/javascript" src="https://github.com/ethereum/web3.js/tree/develop/dist/web3.min.js"></script>
 
 	<script>
 		$.validate({
@@ -75,65 +74,10 @@
 	    modules : 'security',
 	    onSuccess : function($form) {
 	      //alert('The form '+$form.attr('id')+' is valid!');
-				checkWeb3();
+				checkWeb3(submit_member, null);
 				return false;
 	    }
 	  });
-
-
-		function checkWeb3() {
-
-			//web3 브라우저 여부 체크
-			if (typeof web3 !== 'undefined') {
-				// Use Mist/MetaMask's provider
-				window.web3 = new Web3(web3.currentProvider);
-			} else {
-				alert('No web3? You should consider trying MetaMask!');
-				// fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-				window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-				return false;
-			}
-
-			//metamsk 로그인 여부 체크
-			var myAccount = web3.eth.accounts[0];
-			if (typeof myAccount == 'undefined') {
-				alert('Please unlock metamask first');
-				return false;
-			}
-
-			//metamask network 체크. Dev mode require ropsten. change this to case 1 for commercial mode
-			web3.version.getNetwork((err, netId) => {
-				var nwstat = false;
-
-			  switch (netId) {
-			    case "1":
-			      //	alert('This is mainnet')
-			      break
-			    case "2":
-			      //alert('This is the deprecated Morden test network.')
-			      break
-			    case "3":
-			      //alert('This is the ropsten test network.')
-						nwstat = true;
-			      break
-			    case "4":
-			      //alert('This is the Rinkeby test network.')
-			      break
-			    case "42":
-			      //alert('This is the Kovan test network.')
-			      break
-			    default:
-			      //alert('This is an unknown network.')
-			  }
-
-				if(!nwstat) {
-					alert("Please use main network!");
-					return false;
-				} else {
-					submit_member();
-				}
-			});
-		}
 
 
 		function submit_member() {
@@ -155,7 +99,9 @@
 			},
 			function(data, status){
 				if(status == "success"){
-					$("#regist_form").html("Regist OK! <br> Thank you for registration. <br>You can sell your precious products from now.");
+					$("#regist_form").html("Biz information was updated.");
+					alert("Thank you for registration. You can sell your precious products from now.\n This window will be reloaded to main page for biz support menu in a second! ");
+					setTimeout(window.location.replace("/sotmain"),2000);
 				} else {
 					alert("There's some problem . Please try it in seconds.");
 				}

@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+
+		<!-- 공용 header 삽입 부 -->
+		<% include ./head_common.ejs %>
+
+
+	</head>
+
+
+	<body>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+							<% include ./logo_common.ejs %>
+
+							<!-- Section -->
+								<section>
+									<header class="major">
+										<h2>Configuration</h2>
+									</header>
+									<div class="features">
+										<article>
+											<!--span class="icon fa-diamond"></span-->
+											<div class="content">
+												<div id = "regist_form">
+
+													<form id="member_config_form">
+
+														SOT Balance : <input type="text" id="sot_balance" value="Retrieving SOT balance..."> </br>
+
+													</form>
+
+												</div>
+
+											</div>
+										</article>
+									</div>
+								</section>
+
+
+						</div>
+					</div>
+
+				<!-- 왼쪽 사이드바 include 부분 -->
+				<% include ./sidebar_common.ejs %>
+
+			</div>
+
+	</body>
+
+
+  <!--자바스크립트 기입부-->
+
+	<script>
+		$.validate({
+	    form : '#member_config_form',
+	    modules : 'security',
+	    onSuccess : function($form) {
+	      //alert('The form '+$form.attr('id')+' is valid!');
+				submit_member();
+				return false;
+	    }
+	  });
+
+
+		function submit_member() {
+			var addr = "/action_config_member";
+			var email = $("#member_email").val();
+			$.post(addr,
+			{
+				member_email : $("#member_email").val(),
+				member_password : $("#member_password").val(),
+				member_name : $("#member_name").val()
+			},
+			function(data, status){
+				if(status == "success"){
+					$("#regist_form").html("Regist OK! <br> Thank you for registration. <br> your email is "+email+". we sent confirmation email to you.");
+				} else {
+					alert("There's some problem . Please try it in seconds.");
+				}
+			});
+		}
+
+		
+		$(document).ready(function() {
+
+			checkWeb3(null);
+			getCustBalance("sot_balance");
+
+		});
+
+
+
+	</script>
+
+</html>

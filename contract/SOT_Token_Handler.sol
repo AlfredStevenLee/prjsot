@@ -40,26 +40,26 @@ contract Token {
 
 contract StandardToken is Token {
 
-    function transfer(address _to, uint256 _value) returns (bool success) {
+    function transfer(address msender, address _to, uint256 _value) returns (bool success) {
         //Default assumes totalSupply can't be over max (2^256 - 1).
         //If your token leaves out totalSupply and can issue more tokens as time goes on, you need to check if it doesn't wrap.
         //Replace the if with this one instead.
         //if (balances[msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
-        if (balances[msg.sender] >= _value && _value > 0) {
-            balances[msg.sender] -= _value;
+        if (balances[msender] >= _value && _value > 0) {
+            balances[msender] -= _value;
             balances[_to] += _value;
-            Transfer(msg.sender, _to, _value);
+            Transfer(msender, _to, _value);
             return true;
         } else { return false; }
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
+    function transferFrom(address msender, address _from, address _to, uint256 _value) returns (bool success) {
         //same as above. Replace this line with the following if you want to protect against wrapping uints.
         //if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
-        if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
+        if (balances[_from] >= _value && allowed[_from][msender] >= _value && _value > 0) {
             balances[_to] += _value;
             balances[_from] -= _value;
-            allowed[_from][msg.sender] -= _value;
+            allowed[_from][msender] -= _value;
             Transfer(_from, _to, _value);
             return true;
         } else { return false; }
@@ -69,9 +69,10 @@ contract StandardToken is Token {
         return balances[_owner];
     }
 
-    function approve(address _spender, uint256 _value) returns (bool success) {
-        allowed[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value);
+    //owner must call this approve first before sending money
+    function approve(address msender, address _spender, uint256 _value) returns (bool success) {
+        allowed[msender][_spender] = _value;
+        Approval(msender, _spender, _value);
         return true;
     }
 
@@ -105,9 +106,9 @@ contract SOT_Token is StandardToken { // CHANGE THIS. Update the contract name.
     // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function SOT_Token() {
-        balances[msg.sender] = 10000 * 1000000000000000000;          // Give the creator all initial tokens. This is set to 1000 for example. If you want your initial tokens to be X and your decimal is 5, set this value to X * 100000. (CHANGE THIS)
+        balances[msg.sender] = 10000 * 1000000000000000000;               // Give the creator all initial tokens. This is set to 1000 for example. If you want your initial tokens to be X and your decimal is 5, set this value to X * 100000. (CHANGE THIS)
         //balances[msg.sender] = 10000 * 1000000000000000000         // 1만개발행
-        totalSupply = 10000 * 1000000000000000000;                   // Update total supply (1000 for example) (CHANGE THIS)
+        totalSupply = 10000 * 1000000000000000000;                        // Update total supply (1000 for example) (CHANGE THIS)
         name = "Shopping and Trading Token based on Ethereum";       // Set the name for display purposes (CHANGE THIS)
         decimals = 18;                                               // Amount of decimals for display purposes (CHANGE THIS)
         symbol = "SOT";                                              // Set the symbol for display purposes (CHANGE THIS)
@@ -132,14 +133,20 @@ contract SOT_Token is StandardToken { // CHANGE THIS. Update the contract name.
     }
 
     /* Approves and then calls the receiving contract */
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
-        allowed[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value);
+    function approveAndCall(address msender, address _spender, uint256 _value, bytes _extraData) returns (bool success) {
+        allowed[msender][_spender] = _value;
+        Approval(msender, _spender, _value);
 
         //call the receiveApproval function on the contract you want to be notified. This crafts the function signature manually so one doesn't have to include a contract in here just for this.
         //receiveApproval(address _from, uint256 _value, address _tokenContract, bytes _extraData)
         //it is assumed that when does this that the call *should* succeed, otherwise one would use vanilla approve instead.
-        if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
+        if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msender, _value, this, _extraData)) { throw; }
         return true;
+    }
+
+    function kill() public {
+       if (fundsWallet == msg.sender) {
+          selfdestruct(fundsWallet);
+       }
     }
 }

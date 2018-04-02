@@ -77,6 +77,26 @@ module.exports = function(app)
     );
   });
 
+  app.get('/contract_buyer', function(req, res){
+
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").contract_list_buyer(req, res, function(err, data){
+          callback(null, data);
+        });
+      }
+    ],function(err, results) {
+        res.render('../sot_contract_buyer.html', {req : req, res : res, contract_list : results[0] });
+      }
+    );
+  });
+
+  app.get('/config_member', function(req, res){
+    res.render('../sot_config_member.html', {req : req, res : res});
+  });
+
 
   app.get('/editor', function(req, res){
     res.render('../editor.html', {req : req, res : res});
@@ -136,6 +156,10 @@ module.exports = function(app)
 
 
   app.post('/action_buy_product', require("../src/ctl_product").buy_product);
+
+  app.post('/action_confirm_contract', require("../src/ctl_product").confirm_contract);
+
+  app.post('/action_cancel_contract', require("../src/ctl_product").cancel_contract);
 
 
 

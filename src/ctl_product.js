@@ -94,10 +94,47 @@ exports.prod_list = function(req, res, callback) {
     }
 
     //Make Query
-    var sql = "select id, prod_name, img_url, price_krw, price_sot, price_eth from product where active_yn = 'Y' ";
+    var sql = "select id, prod_name, img_url, price_krw, price_sot, price_eth, logistics_yn from product where active_yn = 'Y' ";
 
     //Execute SQL
     connection.query(sql, function(err_sql, rows)
+    {
+      //var result_str = "";
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql");
+        throw err;
+      }
+
+      //Release connection
+      connection.release();
+      callback(null, rows);
+
+    });
+  });
+};
+
+
+exports.contract_list_buyer = function(req, res, callback) {
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      console.log(">> can't get sql connection!");
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val from contract a, product b, code c where buyer_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc ";
+    var buyer_id = req.session.member_id;
+
+    //Execute SQL
+    connection.query(sql, buyer_id, function(err_sql, rows)
     {
       //var result_str = "";
       if (err_sql)
@@ -212,6 +249,74 @@ exports.buy_product = function(req, res) {
         //Release connection
         connection.release();
       });
+    });
+  });
+};
+
+exports.confirm_contract = function(req, res) {
+  var param = req.body;
+  var contract_id = param.contract_id;
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "update contract set contract_status = 'CNT' where id = ? ";
+
+    connection.query(sql, [contract_id] , function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : "+err_sql);
+        throw err;
+      }
+
+      //console.log("contract id : "+rows[0].cur_id);
+      res.send("SUCCESS");
+
+      //Release connection
+      connection.release();
+    });
+  });
+};
+
+exports.cancel_contract = function(req, res) {
+  var param = req.body;
+  var contract_id = param.contract_id;
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "update contract set contract_status = 'CLS' where id = ? ";
+
+    connection.query(sql, [contract_id] , function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : "+err_sql);
+        throw err;
+      }
+
+      //console.log("contract id : "+rows[0].cur_id);
+      res.send("SUCCESS");
+
+      //Release connection
+      connection.release();
     });
   });
 };

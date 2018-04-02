@@ -85,67 +85,10 @@
 
 
   <!--자바스크립트 기입부-->
-
-	<script type="text/javascript" src="https://github.com/ethereum/web3.js/tree/develop/dist/web3.min.js"></script>
-
 	<script>
 
-		var contractAddress = '0x9c8cfba70716e78f7d188fd8d751f3c0e267a8ab';
-		var abi = [ { "constant": false, "inputs": [ { "name": "contract_no", "type": "uint32" }, { "name": "prod_id", "type": "uint32" }, { "name": "seller_account", "type": "address" }, { "name": "prod_price_sot", "type": "uint32" } ], "name": "addProductContract", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "val", "type": "uint256" } ], "name": "approve", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "from", "type": "address" }, { "name": "to", "type": "address" }, { "name": "val", "type": "uint256" } ], "name": "sendToken", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "to", "type": "address" }, { "name": "val", "type": "uint256" } ], "name": "sendTokenDirect", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "constant": true, "inputs": [ { "name": "contract_no", "type": "uint32" } ], "name": "getProductContract", "outputs": [ { "name": "", "type": "uint32" }, { "name": "", "type": "address" }, { "name": "", "type": "address" }, { "name": "", "type": "uint32" }, { "name": "", "type": "bytes5" }, { "name": "", "type": "bool" }, { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" } ];
-
-
 		function buy_product(buy_prod_id) {
-
-			//web3 브라우저 여부 체크
-			if (typeof web3 !== 'undefined') {
-				// Use Mist/MetaMask's provider
-				window.web3 = new Web3(web3.currentProvider);
-			} else {
-				alert('No web3? You should consider trying MetaMask!');
-				// fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-				window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-				return false;
-			}
-
-			//metamsk 로그인 여부 체크
-			var myAccount = web3.eth.accounts[0];
-			if (typeof myAccount == 'undefined') {
-				alert('Please unlock metamask first');
-				return false;
-			}
-
-			//metamask network 체크. Dev mode require ropsten. change this to case 1 for commercial mode
-			web3.version.getNetwork((err, netId) => {
-				var nwstat = false;
-
-			  switch (netId) {
-			    case "1":
-			      //	alert('This is mainnet')
-			      break
-			    case "2":
-			      //alert('This is the deprecated Morden test network.')
-			      break
-			    case "3":
-			      //alert('This is the ropsten test network.')
-						nwstat = true;
-			      break
-			    case "4":
-			      //alert('This is the Rinkeby test network.')
-			      break
-			    case "42":
-			      //alert('This is the Kovan test network.')
-			      break
-			    default:
-			      //alert('This is an unknown network.')
-			  }
-
-				if(!nwstat) {
-					alert("Please use main network!");
-					return false;
-				} else {
-					doBuyProduct(buy_prod_id);
-				}
-			});
+			checkWeb3(doBuyProduct, buy_prod_id);
 		}
 
 		function doBuyProduct(buy_prod_id){
@@ -171,10 +114,6 @@
 					alert("There's some problem . Please try it in seconds.");
 				}
 			});
-
-
-			//2. save to contract
-
 		}
 
 		function doBuyProductBlockChain(prod_contract_no) {
@@ -214,9 +153,8 @@
 		        $("#detail_form").html("<span style='color:blue'>Product registration completed! Thank you.</span>");
 		        filter.stopWatching();
 		      }
-		   });
-		 });
-
+		   	});
+		 	});
 		}
 
 

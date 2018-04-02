@@ -17,8 +17,16 @@
 <!--jQuery form validator 사용 : http://www.formvalidator.net-->
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
 
+<script type="text/javascript" src="https://github.com/ethereum/web3.js/tree/develop/dist/web3.min.js"></script>
 
 <script>
+
+var contractAddress = '0x96973bb06df09f065f343237d54eb7aab3aa112a';
+
+var abi =   [ { "constant": false, "inputs": [ { "name": "contract_no", "type": "uint32" }, { "name": "prod_id", "type": "uint32" }, { "name": "seller_account", "type": "address" }, { "name": "prod_price_sot", "type": "uint32" } ], "name": "addProductContract", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "val", "type": "uint256" } ], "name": "approve", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [], "name": "kill", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "from", "type": "address" }, { "name": "to", "type": "address" }, { "name": "val", "type": "uint256" } ], "name": "sendToken", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "to", "type": "address" }, { "name": "val", "type": "uint256" } ], "name": "sendTokenDirect", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "contract_no", "type": "uint32" } ], "name": "setApproveByBuyer", "outputs": [ { "name": "", "type": "bool" }, { "name": "", "type": "bytes10" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "contract_no", "type": "uint32" } ], "name": "setCancelContract", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "constant": true, "inputs": [ { "name": "cust", "type": "address" } ], "name": "balanceSot", "outputs": [ { "name": "val", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "contract_no", "type": "uint32" } ], "name": "getProductContract", "outputs": [ { "name": "", "type": "uint32" }, { "name": "", "type": "address" }, { "name": "", "type": "address" }, { "name": "", "type": "uint256" }, { "name": "", "type": "bytes5" }, { "name": "", "type": "bool" }, { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" } ];
+
+
+
 function submit_logout() {
   var addr = "/action_logout_member";
 
@@ -52,5 +60,82 @@ function checkBrowser() {
     return false;
   }
 }
+
+
+function checkWeb3(callbackFunc, param) {
+
+	//web3 브라우저 여부 체크
+	if (typeof web3 !== 'undefined') {
+		// Use Mist/MetaMask's provider
+		window.web3 = new Web3(web3.currentProvider);
+	} else {
+		alert('No web3? You should consider trying MetaMask!');
+		// fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+		window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+		return false;
+	}
+
+	//metamsk 로그인 여부 체크
+	var myAccount = web3.eth.accounts[0];
+	if (typeof myAccount == 'undefined') {
+		alert('Please unlock metamask first');
+		return false;
+	}
+
+	//metamask network 체크. Dev mode require ropsten. change this to case 1 for commercial mode
+	web3.version.getNetwork((err, netId) => {
+		var nwstat = false;
+
+	  switch (netId) {
+	    case "1":
+	      //	alert('This is mainnet')
+	      break
+	    case "2":
+	      //alert('This is the deprecated Morden test network.')
+	      break
+	    case "3":
+	      //alert('This is the ropsten test network.')
+				nwstat = true;
+	      break
+	    case "4":
+	      //alert('This is the Rinkeby test network.')
+	      break
+	    case "42":
+	      //alert('This is the Kovan test network.')
+	      break
+	    default:
+	      //alert('This is an unknown network.')
+	  }
+
+		if(!nwstat) {
+			alert("Please use main network!");
+			return false;
+		} else {
+
+      if (callbackFunc != null) {
+        if (typeof callbackFunc == "function") {
+          if (param == null) {
+            callbackFunc();
+          } else {
+            callbackFunc(param);
+          }
+        }
+      }
+
+		}
+	});
+}
+
+function getCustBalance(containerID) {
+  var userAccount = web3.eth.accounts[0];
+  var contractSot = web3.eth.contract(abi);
+  var productManager = contractSot.at(contractAddress);
+
+  productManager.balanceSot.call(userAccount,function(e,r){
+    txid = r;
+    $("#"+containerID).val(r.toNumber()/10**18);
+  });
+}
+
 
 </script>

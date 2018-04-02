@@ -7,7 +7,7 @@ var app = express();
 
 
 app.use(session({
-  secret: '!@#SOT_SEC_CODE!@#*',
+  secret: '!@#SOT_SEC_CODE$!@#*',
   resave: false,
   saveUninitialized: true
 }));

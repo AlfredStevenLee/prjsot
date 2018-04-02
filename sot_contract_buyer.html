@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+
+		<!-- 공용 header 삽입 부 -->
+		<% include ./head_common.ejs %>
+
+
+	</head>
+
+
+	<body>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+							<% include ./logo_common.ejs %>
+
+							<!-- Section -->
+								<section>
+									<header class="major">
+										<h2>Contract history</h2>
+									</header>
+									<div class="features">
+
+											<!--span class="icon fa-diamond"></span-->
+
+													<% for(var i=0; i < contract_list.length; i++ ) { %>
+														<article>
+
+															<span>
+																<a href="javascript:view_prod_detail('<%- contract_list[i].id %>')" class="image">
+																<% if(contract_list[i].img_url == "null") { %>
+																	<img src="/uploads/def_prod_img.png" alt="" />
+																<% } else { %>
+																	<img src="/uploads/<%-contract_list[i].img_url%>" alt="" style="width:150px;height:150px" />
+																<% } %>
+															  </a>
+															</span>
+															<div class="content" style="margin-left:10px">
+																<p>
+																	<span id="CNTR_STAT_<%- contract_list[i].id %>"><%- contract_list[i].contract_status_val %></span>
+																	<% if (contract_list[i].contract_status == "REG") { %>
+																		<span id="REG_<%- contract_list[i].id %>">
+																		[<a href="javascript:doConfirmContract(<%- contract_list[i].id %>)">Confirm</a> /
+																		<a href="javascript:doCancelContract(<%- contract_list[i].id %>)">Cancel</a>]
+																		</span>
+																	<% } %>
+																</p>
+																<p><%- contract_list[i].prod_name %></p>
+																<p><%- contract_list[i].price_sot %> SOT (<%- contract_list[i].price_krw %> KRW) </p>
+																<p>payment account : <%- contract_list[i].buyer_account_no %> </p>
+
+																<!--p>contract : <%- contract_list[i].id %> / product : <%- contract_list[i].prod_id %> </p>
+																<p>seller id : <%- contract_list[i].seller_id %> </p>
+																<p>seller acc : <%- contract_list[i].seller_account_no %> </p-->
+
+															</div>
+														</article>
+													<% } %>
+
+									</div>
+								</section>
+
+
+						</div>
+					</div>
+
+				<!-- 왼쪽 사이드바 include 부분 -->
+				<% include ./sidebar_common.ejs %>
+
+			</div>
+
+	</body>
+
+
+  <!--자바스크립트 기입부-->
+
+	<script>
+
+		// confirm contract ---------------------------------------------------------
+		function doConfirmContract(id) {
+			checkWeb3(submit_doConfirmContract, id);
+		}
+
+		function submit_doConfirmContract(id) {
+			$("#CNTR_STAT_"+id).html("<span style='color:red'>Now progressing...</span>");
+			var addr = "/action_confirm_contract";
+
+			$.post(addr,
+			{
+				contract_id:id
+			},
+			function(prod_contract_no, status){
+				if(status == "success"){
+					//$("#detail_form").html("<span style='color:red'>Product saved in Database</span>");
+					//alert("prod_contract_no : "+prod_contract_no)
+					doConfirmContractBlockChain(id);
+				} else {
+					alert("There's some problem . Please try it in seconds.");
+				}
+			});
+		}
+
+		function doConfirmContractBlockChain(prod_contract_no) {
+
+			var contractSot = web3.eth.contract(abi);
+			var productManager = contractSot.at(contractAddress);
+
+			var contract_no = prod_contract_no;
+			var txid;
+
+			productManager.setApproveByBuyer.sendTransaction(contract_no,function(e,r){
+				txid = r;
+				//$("#detail_form").html("<span style='color:green'>Product registration is proceeding...</span>");
+			});
+
+			var filter = web3.eth.filter('latest');
+		  filter.watch(function(e, r) {
+		    //getValue();
+		    web3.eth.getTransaction(txid, function(e,r){
+		      if (r != null && r.blockNumber > 0) {
+		        $("#REG_"+contract_no).remove();
+						$("#CNTR_STAT_"+contract_no).html("Payment confirmed");
+		        filter.stopWatching();
+		      }
+		   	});
+		 	});
+		}
+
+		// cancel contract ---------------------------------------------------------
+		function doCancelContract(id) {
+			checkWeb3(submit_doCancelContract, id);
+		}
+
+		function submit_doCancelContract(id) {
+			$("#CNTR_STAT_"+id).html("<span style='color:red'>Now progressing...</span>");
+			var addr = "/action_cancel_contract";
+
+			$.post(addr,
+			{
+				contract_id:id
+			},
+			function(prod_contract_no, status){
+				if(status == "success"){
+					//$("#detail_form").html("<span style='color:red'>Product saved in Database</span>");
+					//alert("prod_contract_no : "+prod_contract_no)
+					doCancelContractBlockChain(id);
+				} else {
+					alert("There's some problem . Please try it in seconds.");
+				}
+			});
+		}
+
+		function doCancelContractBlockChain(prod_contract_no) {
+
+			var contractSot = web3.eth.contract(abi);
+			var productManager = contractSot.at(contractAddress);
+
+			var contract_no = prod_contract_no;
+			var txid;
+
+			productManager.setCancelContract.sendTransaction(contract_no,function(e,r){
+				txid = r;
+				//$("#detail_form").html("<span style='color:green'>Product registration is proceeding...</span>");
+			});
+
+			var filter = web3.eth.filter('latest');
+		  filter.watch(function(e, r) {
+		    //getValue();
+		    web3.eth.getTransaction(txid, function(e,r){
+		      if (r != null && r.blockNumber > 0) {
+		        $("#REG_"+contract_no).remove();
+						$("#CNTR_STAT_"+contract_no).html("Order canceled");
+		        filter.stopWatching();
+		      }
+		   	});
+		 	});
+		}
+
+
+	</script>
+
+</html>

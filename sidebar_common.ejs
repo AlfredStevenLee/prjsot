@@ -34,17 +34,27 @@
                 <li><a href="#">Feugiat Veroeros</a></li>
               </ul>
             </li>
-            <li><a href="/register_product">Add Product(Biz Owner)</a></li>
+            <% if (req.session.login && req.session.biz) { %>
+              <li><a href="/register_product">Add Product(Biz Owner)</a></li>
+            <% } %>
+
+            <% if (req.session.login) { %>
             <li>
               <span class="opener">My Pages</span>
               <ul>
-                <li><a href="#">Account Configuration</a></li>
-                <li><a href="/register_bizinfo">Register as Seller</a></li>
-                <li><a href="#">History</a></li>
+                <li><a href="/config_member">Account Configuration</a></li>
+
+                <% if (req.session.login && !req.session.biz) { %>
+                  <li><a href="/register_bizinfo">Register as Seller</a></li>
+                <% } %>
+
+                <li><a href="/contract_buyer">History</a></li>
                 <li><a href="#">Termination</a></li>
                 <li><a href="#">Alarms</a></li>
               </ul>
             </li>
+            <% } %>
+
           </ul>
         </nav>
 

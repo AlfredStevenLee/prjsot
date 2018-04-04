@@ -4,6 +4,45 @@ var dbpool = require("./dbcon").pool;
 //메인 컨트롤러 파일
 //아래와 같이 export를 통해 하나씩 메소드를 지정하고 그 내부에서 렌더링 할 파일로 redirection하면서 결과값을 함게 보내 줌
 
+exports.sendmailByAdmin = function(req, res, _to, _subject, _body, callback) {
+  var nodemailer = require('nodemailer');
+
+  var smtpTransport = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: 'dwsmile@gmail.com',
+      pass: 'dwlee1975!'
+    }
+  });
+
+  var mailOption = {
+    from: 'SOT Innovation <dwsmile@gmail.com>',
+    to: _to,
+    subject: _subject,
+    html: _body
+  };
+
+  smtpTransport.sendMail(mailOption, function(error, response) {
+    if(error) {
+      console.log(">>error from sendmailAdmin : "+error);
+      callback(error, "FAIL");
+    } else {
+      smtpTransport.close();
+      callback(error, "SUCCESS");
+    }
+  });
+
+};
+
+exports.getVerificationSecid = function(_email) {
+  var crypto = require('crypto');
+  var data = _email + Math.round((Math.random()*100)+Math.floor(new Date()/1000));
+  //console.log("#1 : "+data);
+  var result = crypto.createHash('md5').update(data).digest("hex");
+  //console.log("#2 : "+result);
+  return result;
+};
+
 exports.checkNullNumber = function(val) {
   //console.log("check1 > "+val);
   if (!val) {

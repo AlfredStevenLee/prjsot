@@ -40,9 +40,8 @@
 														email : <input type="text" name="member_email" id="member_email" data-validation="required email length" data-validation-length="max50"> </br>
 														password : <input type="password" name="member_password" id="member_password" data-validation="required length" data-validation-length="min8"> </br>
 														<input type="submit" id="member_regist" value="Login">
-												</form>
+													</form>
 												</div>
-
 											</div>
 										</article>
 									</div>
@@ -85,13 +84,12 @@
 			function(data, status){
 				if(status == "success"){
 					//$("#regist_form").html("Regist OK! <br> Thank you for registration. <br> your email is "+email+". we sent confirmation email to you.");
-					if (data == "LOGIN_SUCCESS")
-					{
+					if (data == "LOGIN_SUCCESS") {
 						$("#member_login_form").html("Login Success");
 						window.location.replace("/sotmain");
-					}
-					else
-					{
+					} else if (data == "NOT_VERIFIED") {
+						$("#member_login_form").html("Your email isn't verified yet. Please verify first and activate account.");
+					}	else {
 						$("#member_login_form").html("Login Failed");
 					}
 				} else {

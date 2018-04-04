@@ -6,109 +6,158 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
-  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.2.3/milligram.min.css">
-  <title>Simple Storage Dapp 예제 </title>
-  <style>
-    body {margin-left:50px;}
-    #storedData {font-size:300%; margin-right:10px;}
-    #newValue {width: 200px; margin-right:10px; text-align:right;}
-  </style>
+  <title>SOT API Tester</title>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
 </head>
+
 <body>
-<h3>Simple Storage dApp 예제</h3>
-<ul>
-  <li>컨트랙트 주소: <span id="contractAddr"></span></li>
-  <li>내 어카운트 주소: <span id="accountAddr"></span></li>
-  <li>컨트랙트에 저장된 값: <span id="storedData"></span>
-    <button onclick="getValue()">새로고침</button> (현재블록: <span id="lastBlock"></span>)</li>
-  <li><input id="newValue" type="text"><button onclick="setValue()">새 값으로 저장하기</button>
-      <div id="result"></div></li>
-  <li>새 값을 저장한 후 팬딩 트랜잭션이 블록에 포함되면 자동으로 페이지가 업데이트될 것입니다.</li>
-</ul>
+  <br> from wiki 내용...
+  <p> 홈쇼핑은 통신 판매의 하나로, 가정에서 통신 회선을 통하여 쇼핑을 할 수 있는 서비스. <br>
+      PC통신, 인터넷 통신, 쌍방향 케이블 텔레비전 등 통신망에서 다양한 상품의 전시나 광고를 보고 상품을 주문하고 대금을 신용카드나 <br>
+      디지털 현금 등으로 결제하는 다양한 홈쇼핑 서비스가 개발, 시행되고 있다. 인터넷에는 무수한 상품 판매 서비스가 있는데 이것을 <br>
+      사이버 쇼핑이라고 한다. 그중에 TV 방송에 최근 유행하는 <shop-sot item='1'>패션의류</shot-sot>인 ...
+  </p>
+  <p>....<br> from news...</p>
+  <p>
+    직장인이자 워킹맘인 김모(35)씨는 지난달 29일 TV 채널을 돌리다 자신이 좋아하는 YG엔터테인먼트 소속 아이돌 아이콘(IKON)의 '먹방'을 우연히 발견했다.
 
-컨트랙트 소스
-<script src="https://gist.github.com/atomrigs/7c633570496b79623bed5d1286f93f3a.js"></script>
+아이콘이 출연한 프로그램은 음식 프로그램이나 예능이 아닌 홈쇼핑 방송.
 
-HTML 소스<br>
-<a href="https://github.com/atomrigs/atomrigs.github.io/blob/master/simplestorage.html">https://github.com/atomrigs/atomrigs.github.io/blob/master/simplestorage.html</a>;
-<br><br>
-<p>
-<a href="http://www.chaintalk.io/archive/lecture?sca=%EB%82%98%EB%8F%84+dApp+%EA%B0%9C%EB%B0%9C"><i>나도 dApp 개발해 보자 시리즈 by Atomrigs © 2017</i></a>
-</p>
+<div>YG푸즈의 노희영 대표가 기획한 '<shop-sot item='5'>삼거리푸줏간 불고기세트(6만900원)</shop-sot>'를 맛있게 먹는</div> 먹방쇼에 김씨는 매콤한맛과 간장맛 두 세트를 바로 주문했다.
+
+김씨는 "아이콘의 바비 팬인데 <div>구매고객에게 <shop-sot>화장</shop-sot>같은 굿즈를 준다고 해서 망설임 없이 주문 버튼을 눌렀다"고 말했다.
+
+상품이 주인공이었던 홈쇼핑에 '연예인 바람'이 불고 있다.</div>
+
+단순 상품 판매 방송에서 벗어나 배우와 개그맨, 가수 등이 출연해 재미있는 볼거리를 제공하며 더 재밌고 이색적인 콘텐츠를 제공하기 위한 홈쇼핑사들의 경쟁이 치열해지는 모습이다.
+
+지난달 27일 CJ오쇼핑이 tvN 코미디빅리그와 함께 방송한 '코빅마켓'은 평소 화요일 동시간대 (밤10시45분~새벽1시) 방송 대비 4배 이상 높은 시청률을 기록했다.
+
+특히 젊은층 소비자들의 반응이 뜨거웠다.
+
+박나래 등 인기 개그맨들이 <shop-sot item='여성'>패션의류</shop-sot>, <shop-sot item='장난감'>아이들장남감</shop-sot>, <shop-sot>낚시</shop-sot> 등 판매 상품을 콩트로 재치 있게 풀어내며 2시간 15분 동안 판매한 4개 상품은 총 주문금액 10억원 이상을 달성했다.
+
+40~50대 구매비중이 높았던 <shop-sot item='2'>필립스 면도기</shop-sot>의 경우, 20대 주문 비중이 동일 상품의 최근 3회 방송들의 20대 주문 평균보다 두 배 가량 높았던 것으로 나타났다.
+  </p>
 
 </body>
 
-<script src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.js"></script>
 
-<!-- script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script -->
+
+
+<style>
+
+  .shop {
+    color:blue;
+    cursor:pointer;
+    text-decoration:underline dashed grey;
+  }
+
+  .shop:hover {
+    color:red;
+    cursor:pointer;
+    text-decoration:none;
+  }
+
+</style>
+
 
 <script>
-var contractAddress = '0xC2eeFB9BD5223b06FE6863f2b1C5CF5a7FE1DF10';
-var abi = [{"constant":false,"inputs":[{"name":"input","type":"uint256"}],"name":"set","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"get","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}];
-var simpleStorageContract;
-var simpleStorage;
 
-window.addEventListener('load', function() {
+$(document).ready(function(){
+  //var shoptag = $("shop-sot").toArray();
+  //alert(shoptag.length);
 
-  // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-  if (typeof web3 !== 'undefined') {
-    // Use Mist/MetaMask's provider
-    window.web3 = new Web3(web3.currentProvider);
-  } else {
-    console.log('No web3? You should consider trying MetaMask!')
-    // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-    window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+  $("shop-sot").addClass("shop");
+  $("shop-sot").before("<span style='font-size:5pt;color:red;font-weight:bold;vertical-align:super'>SOT</span>");
+  $("shop-sot").click(sot_find_product);
+  $("body").append("<div id='sot_container' style='position:absolute;top:0;left:0;visibility:hidden;background:white;border:1px solid grey;padding:1px;z-index:90;display:flex;width:200px;height:40px'><img id='sot_prod_img' src='http://127.0.0.1:8080/uploads/dummy.jpg' style='width:20%'><div style='font-size:8pt;line-height:2px;padding-left:2px'><p id='sot_prod_name' style='width:100%;'>Product name is ..</p><p id='sot_prod_price'>Price is 000 SOT</p><input type='hidden' id='sot_prod_id'></div></div>");
+  $("#sot_container").mouseleave(function(){
+    $(this).css("visibility", "hidden");
+  });
+
+  /*
+  $("shop-sot").each(function(){
+    alert($(this).attr("item"));
+    //$(this).addClass("shop");
+    //$(this).before("<span style='font-size:5pt;color:red;font-weight:bold;vertical-align:super'>SOT</span>");
+  });
+  */
+
+  /*
+  alert(shoptag[0].innerHTML);
+
+  //태그 배열 탐색 - 일반 HTML 오브젝트 테그를 사용해야 함
+  for(var i=0; i<shoptag.length; i++) {
+    //alert(shoptag[i].html());
+    shoptag[i].style.color = "red";
   }
-  // Now you can start your app & access web3 freely:
-  startApp();
+  */
+
 });
 
-function startApp() {
-  simpleStorageContract = web3.eth.contract(abi);
-  simpleStorage = simpleStorageContract.at(contractAddress);
-  document.getElementById('contractAddr').innerHTML = getLink(contractAddress);
-  web3.eth.getAccounts(function(e,r){
-    document.getElementById('accountAddr').innerHTML = getLink(r[0]);
-  });
+function sot_find_product() {
+  //alert($(this).attr("item"));
+  var searchType;
+  var searchKey;
+  var attr = $(this).attr("item");
 
-  getValue();
-}
+  if (attr == undefined) {
+    searchType = "BY_NAME";
+    searchKey = $(this).text();
+  } else {
+    if($.isNumeric(attr)) {
+      searchType = "BY_PROD_CD";
+    } else {
+      searchType = "BY_CATEGORY";
+    }
+    searchKey = $(this).attr("item");
+  }
 
-function getLink(addr) {
-  return '<a target="_blank" href=https://testnet.etherscan.io/address/' + addr + '>' + addr +'</a>';
-}
+  //alert("searchType : "+searchType+" / searchKey : "+searchKey);
+  $("#sot_container").css("visibility", "hidden");
+  var offsetSOT = $(this).offset();
 
-function getValue() {
-  simpleStorage.get(function(e,r){
-    document.getElementById('storedData').innerHTML=r.toNumber();
+  //Get data from platform and set to #sot_prod_img, #sot_prod_name, #sot_prod_price, #sot_prod_id
 
-  });
-  web3.eth.getBlockNumber(function(e,r){
-    document.getElementById('lastBlock').innerHTML = r;
-  });
-}
+  var addr = "http://127.0.0.1:8080/action_find_product";
 
-function setValue() {
+  $.post(addr,
+  {
+    searchType : searchType,
+    searchKey : searchKey,
+    ad_biz_code : "#1234qwerasdf#$%^poiu#"
+  },
+  function(data, status){
+    if(status == "success"){
+      //$("#regist_form").html("Thank you for registration. <br> your email is "+email+". We sent verification email to you. Please confirm it soon.");
 
-  var newValue = document.getElementById('newValue').value;
-  var txid;
-  simpleStorage.set(newValue, function(e,r){
-    document.getElementById('result').innerHTML = 'Transaction id: ' + r + '<span id="pending" style="color:red;">(Pending)</span>';
-    txid = r;
-  });
-  var filter = web3.eth.filter('latest');
-  filter.watch(function(e, r) {
-    getValue();
-    web3.eth.getTransaction(txid, function(e,r){
-      if (r != null && r.blockNumber > 0) {
-        document.getElementById('pending').innerHTML = '(기록된 블록: ' + r.blockNumber + ')';
-        document.getElementById('pending').style.cssText ='color:green;';
-        document.getElementById('storedData').style.cssText ='color:green; font-size:300%;';
-        filter.stopWatching();
+      if(data == "NO_DATA") {
+        alert("NO DATA FOUND");
+      } else {
+        $("#sot_prod_img").attr("src","http://127.0.0.1:8080/uploads/"+data[0].img_url);
+        $("#sot_prod_name").text(data[0].prod_name);
+        $("#sot_prod_price").text(data[0].price_sot+" SOT");
+        $("#sot_prod_id").val(data[0].id);
+
+        //View the result
+        $("#sot_container").css("visibility", "visible");
+        $("#sot_container").css("top", offsetSOT.top+20);
+        $("#sot_container").css("left", offsetSOT.left);
+
       }
-   });
- });
+    } else {
+      alert("There's some problem . Please try it in seconds.");
+    }
+  });
 }
+
 
 </script>
+
+
 </html>

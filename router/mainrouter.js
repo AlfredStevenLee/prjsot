@@ -93,8 +93,25 @@ module.exports = function(app)
     );
   });
 
+
   app.get('/config_member', function(req, res){
     res.render('../sot_config_member.html', {req : req, res : res});
+  });
+
+
+  app.get('/verify_email', function(req, res){
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_member").verify_member(req, res, function(err, data) {
+          callback(null, data);
+        });
+      }
+    ],function(err, results) {
+        res.render('../sot_verify_member.html', {req : req, res : res, verify_result : results[0], emailaddr : req.query.emailaddr });
+      }
+    );
   });
 
 
@@ -161,6 +178,6 @@ module.exports = function(app)
 
   app.post('/action_cancel_contract', require("../src/ctl_product").cancel_contract);
 
-
+  app.post('/action_find_product', require("../src/ctl_product").find_product_biz);
 
 }

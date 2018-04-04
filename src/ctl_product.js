@@ -320,3 +320,55 @@ exports.cancel_contract = function(req, res) {
     });
   });
 };
+
+exports.find_product_biz = function(req, res) {
+  var param = req.body;
+  var searchType = param.searchType;  // BY_NAME, BY_PROD_CD, BY_CATEGORY
+  var searchKey = param.searchKey;
+  var ad_biz_code = param.ad_biz_code;
+
+  //console.log(">>Find product request : "+searchType+"/"+searchKey+"/"+ad_biz_code)
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "";
+    if (searchType == "BY_PROD_CD") {
+      sql = "select id, prod_name, img_url, price_sot from product where id = "+searchKey+" and active_yn = 'Y' ";
+    } else if (searchType == "BY_NAME") {
+      sql = "select id, prod_name, img_url, price_sot from product where prod_name like '%"+searchKey+"%' and active_yn = 'Y' limit 0,1 ";
+      //searchKey = "'%"+searchKey+"%'";
+    } else {
+      // BY_CATEGORY   ***************** make query new ******
+      sql = "select id, prod_name, img_url, price_sot from product where prod_name like '%"+searchKey+"%' and active_yn = 'Y' limit 0,1 ";
+    }
+
+    //Execute SQL
+    connection.query(sql, function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql. find_product_biz : "+err_sql);
+        throw err;
+      }
+
+      //Send result & Redirect to view. Something have to be sent back
+      if(rows.length == 0) {
+        res.send("NO_DATA");
+      } else {
+        res.send(rows);
+      }
+
+      //Release connection
+      connection.release();
+    })
+  })
+};

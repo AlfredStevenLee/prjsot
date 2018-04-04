@@ -2101,6 +2101,8 @@
 
 		}
 
+/* 태그의 상세 속성 설정 부분 */
+/* a태그 링크 설정 부분 */
 	a {
 		-moz-transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
 		-webkit-transition: color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
@@ -2129,10 +2131,12 @@
 		font-style: italic;
 	}
 
+/* p태그 기본 설정 값 */
 	p {
 		margin: 0 0 1em 0;
 	}
 
+/* h태그의 글자 색상과 크기 기본값 설정 */
 	h1, h2, h3, h4, h5, h6 {
 		color: #3d4449;
 		font-family: sans-serif;
@@ -2172,6 +2176,7 @@
 		font-size: 0.7em;
 	}
 
+/* h1태그는 해상도별로 글자 크기를 다르게 별도로 지정 함 */
 	@media screen and (max-width: 1680px) {
 
 		h1 {
@@ -2266,8 +2271,9 @@
 		text-align: right;
 	}
 
-/* Section/Article */
 
+/* Section/Article */
+/* section과 article아래의 special 태그 글자들은 중간 정렬  */
 	section.special, article.special {
 		text-align: center;
 	}
@@ -2305,6 +2311,7 @@
 		margin: 0 0 1em 0;
 	}
 
+/* 폼 개체들의 외형을 초기화 시키고 재 설정 함 */
 	input[type="text"],
 	input[type="password"],
 	input[type="email"],
@@ -2329,6 +2336,7 @@
 		width: 100%;
 	}
 
+/* 폼태그에 invalid 속성 적용시 그림자를 없앤다 */
 		input[type="text"]:invalid,
 		input[type="password"]:invalid,
 		input[type="email"]:invalid,
@@ -2340,6 +2348,7 @@
 			box-shadow: none;
 		}
 
+/* 폼태그가 포커스를 받으면 보더 색상과 그림자를 준다 */
 		input[type="text"]:focus,
 		input[type="password"]:focus,
 		input[type="email"]:focus,
@@ -2385,6 +2394,7 @@
 			display: none;
 		}
 
+/* 폼태그의 직사각형 개체의 높이크기를 2.75em으로 기본 설정 */
 	input[type="text"],
 	input[type="password"],
 	input[type="email"],
@@ -2399,6 +2409,7 @@
 		padding: 0.75em 1em;
 	}
 
+/* 기본 checkbox, radio는 형태만 숨기로 클릭 될 수 있도록 만듬. 그리고 checked 될때 적정한 체크 이미지문자를 보여 줌 */
 	input[type="checkbox"],
 	input[type="radio"] {
 		-moz-appearance: none;
@@ -2413,6 +2424,7 @@
 		z-index: -1;
 	}
 
+/* 폼태그 중 checkbox와 radio는 label을 가져야 하며 해당 label의 모양을 지정한다 */
 		input[type="checkbox"] + label,
 		input[type="radio"] + label {
 			text-decoration: none;
@@ -2426,6 +2438,7 @@
 			position: relative;
 		}
 
+/* checkbox와 radio와 쌍으로 있는 label의 맨앞에 체크를 위한 이미지를 추가한다 */
 			input[type="checkbox"] + label:before,
 			input[type="radio"] + label:before {
 				-moz-osx-font-smoothing: grayscale;
@@ -2543,6 +2556,7 @@
 
 /* Image */
 
+
 	.image {
 		border-radius: 0.375em;
 		border: 0;
@@ -2550,6 +2564,7 @@
 		position: relative;
 	}
 
+/* img태그를 적용하기 위해서 image클래그 밑에 img 태그를 정의해 주고 block타입으로 적용 됨 */
 		.image img {
 			border-radius: 0.375em;
 			display: block;
@@ -2563,12 +2578,13 @@
 				width: 100%;
 			}
 
+/* 왼쪽에 배치되는 이미지 적용 방식 */
 		.image.left {
 			float: left;
 			padding: 0 1.5em 1em 0;
 			top: 0.25em;
 		}
-
+/* 오른쪽 적용 방식 */
 		.image.right {
 			float: right;
 			padding: 0 0 1em 1.5em;
@@ -2936,6 +2952,7 @@
 
 /* Button */
 
+/* 폼의 버튼 타입 태그의 동작과 모양을 설정 */
 	input[type="submit"],
 	input[type="reset"],
 	input[type="button"],
@@ -3572,6 +3589,7 @@
 			padding-right: 2.75em;
 		}
 
+/* 사이드 매뉴바의 속성과 스타일 지정 */
 	#sidebar {
 		-moz-flex-grow: 0;
 		-webkit-flex-grow: 0;
@@ -3650,14 +3668,14 @@
 			#sidebar .toggle:before {
 				-moz-osx-font-smoothing: grayscale;
 				-webkit-font-smoothing: antialiased;
-				font-family: FontAwesome;
+				font-family: FontAwesome;  /* 메뉴 토글바 폰트종류 */
 				font-style: normal;
 				font-weight: normal;
 				text-transform: none !important;
 			}
 
 			#sidebar .toggle:before {
-				content: '\f0c9';        /* 메뉴 토글 바 글자 색상과 크기 */
+				content: '\f0c9';        /* 메뉴 토글 바 글자와 크기 */
 				font-size: 2rem;
 				height: inherit;
 				left: 0;

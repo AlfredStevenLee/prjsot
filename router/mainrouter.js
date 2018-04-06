@@ -1,6 +1,7 @@
 module.exports = function(app)
 {
 
+  //라우터에서 multer file uploader 사용선언
   var multer = require('multer');
   var storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -14,6 +15,16 @@ module.exports = function(app)
   });
 
   var upload = multer({ storage : storage, limits : {fileSize:'50mb'}});
+
+
+
+  //라우터 시작시 스케줄러 자동시작    [초] 분 시 일 월 요일
+  var schedule = require('node-schedule');
+  var j = schedule.scheduleJob('*/10 * * * *', function(){   // _부분은 지울 것  /5은 매 5초, 매분을 의미 -> 현재 매 10분 마다
+    require("../src/ctl_util").getCurrencyInfo("ETH");
+  });
+
+
 
   app.get('/', function(req, res){
     res.render('sot_index.html', {req : req, res : res});

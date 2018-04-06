@@ -51,18 +51,49 @@
 
 <style>
 
-  .shop {
-    color:blue;
-    cursor:pointer;
-    text-decoration:underline dashed grey;
-  }
+.shop {
+  color:blue;
+  cursor:pointer;
+  text-decoration:underline dashed grey;
+}
 
-  .shop:hover {
-    color:red;
-    cursor:pointer;
-    text-decoration:none;
-  }
-
+.shop:hover {
+  color:red;
+  cursor:pointer;
+  text-decoration:none;
+}
+.sot_box{
+  position:absolute;top:0;left:0;display:none;
+}
+.sot_container {
+  background:#000000;border:1px solid #cccccc;padding:4px;z-index:90;
+  display:flex;display:-webkit-flex;width:210px;height:45px;box-shadow:3px 3px 10px grey;
+  border-radius: 8px;opacity:0.8;color:#ffffff;
+}
+.sot_prod_img {
+  width:20%;border-radius:5px;
+}
+.sot_content_container {
+  font-size:9pt;padding-left:2px;
+}
+.sot_prod_name {
+  padding:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:150px;
+}
+.sot_prod_content {
+  padding:0;margin:5px;width:150px;display:flex;display:-webkit-flex;
+}
+.sot_prod_price {
+  width:150px;padding:0;margin:0;
+}
+.sot_prod_detail {
+  width:120px;text-align:right;padding:0;margin:0;
+}
+#sot_view_more{
+  color:white;
+}
+#sot_view_more:hover{
+  color:orange;
+}
 </style>
 
 
@@ -74,11 +105,26 @@ $(document).ready(function(){
 
   $("shop-sot").addClass("shop");
   $("shop-sot").before("<span style='font-size:5pt;color:red;font-weight:bold;vertical-align:super'>SOT</span>");
-  $("shop-sot").click(sot_find_product);
-  $("body").append("<div id='sot_container' style='position:absolute;top:0;left:0;visibility:hidden;background:white;border:1px solid grey;padding:1px;z-index:90;display:flex;width:200px;height:40px'><img id='sot_prod_img' src='http://127.0.0.1:8080/uploads/dummy.jpg' style='width:20%'><div style='font-size:8pt;line-height:2px;padding-left:2px'><p id='sot_prod_name' style='width:100%;'>Product name is ..</p><p id='sot_prod_price'>Price is 000 SOT</p><input type='hidden' id='sot_prod_id'></div></div>");
-  $("#sot_container").mouseleave(function(){
-    $(this).css("visibility", "hidden");
+  $("shop-sot").mouseenter(sot_find_product);
+  $("body").append("<div id='sot_box' class='sot_box'><div id='sot_container' class='sot_container'><img id='sot_prod_img' src='http://127.0.0.1:8080/uploads/dummy.jpg' class='sot_prod_img'><div class='sot_content_container'><div id='sot_prod_name' class='sot_prod_name'>Product name is ..</div><div class='sot_prod_content'><div id='sot_prod_price' class='sot_prod_price'>Price is 000 SOT</div><div id='sot_prod_detail' class='sot_prod_detail'><a href='#' id='sot_view_more' target='_blank'>more</a></div></div></div></div></div>");
+  $("#sot_box").mouseleave(function(){
+    //$(this).css("visibility", "hidden");
+    $(this).fadeOut("fast");
   });
+
+  /*
+  "<div id='sot_container' class='sot_container'>
+    <img id='sot_prod_img' src='http://127.0.0.1:8080/uploads/dummy.jpg' class='sot_prod_img'>
+    <div class='sot_content_container'>
+      <div id='sot_prod_name' class='sot_prod_content'>Product name is ..</div>
+      <div class='sot_prod_content'>
+        <div id='sot_prod_price' class='sot_prod_content'>Price is 000 SOT</div>
+        <div id='sot_prod_detail' class='sot_prod_detail'>detail info.</div>
+        <input type='hidden' id='sot_prod_id'>
+      </div>
+    </div>
+  </div>"
+  */
 
   /*
   $("shop-sot").each(function(){
@@ -97,8 +143,8 @@ $(document).ready(function(){
     shoptag[i].style.color = "red";
   }
   */
-
 });
+
 
 function sot_find_product() {
   //alert($(this).attr("item"));
@@ -119,7 +165,7 @@ function sot_find_product() {
   }
 
   //alert("searchType : "+searchType+" / searchKey : "+searchKey);
-  $("#sot_container").css("visibility", "hidden");
+  //
   var offsetSOT = $(this).offset();
 
   //Get data from platform and set to #sot_prod_img, #sot_prod_name, #sot_prod_price, #sot_prod_id
@@ -142,12 +188,17 @@ function sot_find_product() {
         $("#sot_prod_img").attr("src","http://127.0.0.1:8080/uploads/"+data[0].img_url);
         $("#sot_prod_name").text(data[0].prod_name);
         $("#sot_prod_price").text(data[0].price_sot+" SOT");
-        $("#sot_prod_id").val(data[0].id);
+        //$("#sot_prod_id").val(data[0].id);
+        $("#sot_view_more").attr("href","http://127.0.0.1:8080/sot_view_product?prod_id="+data[0].id);
+
+        //alert($("#sot_view_more").attr("href"));
 
         //View the result
-        $("#sot_container").css("visibility", "visible");
-        $("#sot_container").css("top", offsetSOT.top+20);
-        $("#sot_container").css("left", offsetSOT.left);
+
+        //$("#sot_container").css("visibility", "visible");
+        $("#sot_box").css("top", offsetSOT.top+20);
+        $("#sot_box").css("left", offsetSOT.left);
+        $("#sot_box").fadeIn("fast");
 
       }
     } else {

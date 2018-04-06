@@ -4,6 +4,66 @@ var dbpool = require("./dbcon").pool;
 //메인 컨트롤러 파일
 //아래와 같이 export를 통해 하나씩 메소드를 지정하고 그 내부에서 렌더링 할 파일로 redirection하면서 결과값을 함게 보내 줌
 
+
+
+/**
+ * 빗썸에서 currency 정보를 가지고 옴. 최근 데이터 조회는 아래 쿼리로 함
+ * select * from currency order by id desc limit 0,1;
+ */
+exports.getCurrencyInfo = function(currency) {
+  //console.log('Job Executed from router : '+new Date());
+
+  const https = require("https");
+
+  const url = "https://api.bithumb.com/public/ticker/"+currency;
+  https.get(url, res => {
+    res.setEncoding("utf8");
+    let body = "";
+    res.on("data", data => {
+      body += data;
+    });
+    res.on("end", () => {
+      //console.log(body);
+      body = JSON.parse(body);
+      /*console.log(">>last status : "+body.status);
+      console.log(">>last price : "+body.data.closing_price);
+      console.log(">>last update : "+body.data.date);*/
+      var eth_krw = parseInt(body.data.closing_price);
+      var sot_krw = eth_krw/100;
+      if(body.status == "0000") {
+        dbpool.getConnection(function(err, connection){
+
+          if (err)
+          {
+            console.log(">> can't get sql connection!");
+            connection.release();
+            throw err;
+          }
+
+          //Make Query
+          var sql = "insert into currency values(null,?,?,now()) ";
+
+          //Execute SQL
+          connection.query(sql,[eth_krw, sot_krw] ,function(err_sql, rows)
+          {
+            if (err_sql)
+            {
+              connection.release();
+              console.log(">> error from sql");
+              throw err;
+            }
+
+            //Release connection
+            connection.release();
+          });
+        });
+      }
+    });
+  });
+}
+
+
+
 exports.sendmailByAdmin = function(req, res, _to, _subject, _body, callback) {
   var nodemailer = require('nodemailer');
 

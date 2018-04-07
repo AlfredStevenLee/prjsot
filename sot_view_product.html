@@ -40,23 +40,46 @@
 
 													<form id="product_detail_form" method="post">
 
-														Category : <span><%- prod_detail[0].cat_name %></span> </br>
-														Product Name : <span><%- prod_detail[0].prod_name %></span> </br>
-														Main Image : <span class="image"><img src="/uploads/<%- prod_detail[0].img_url %>"></span> </br></br>
-														Price(KRW) : <span><%- prod_detail[0].price_krw %></span> </br>
-														Price(SOT) : <span><%- prod_detail[0].price_sot %></span> </br>
-														Price(ETH) : <span><%- prod_detail[0].price_eth %></span> </br>
-														Logistics Y/N : <span><%- prod_detail[0].logistics_yn %></span> </br></br>
-														Description : <br>
-														<div id="prod_preview" class="box"><%- prod_detail[0].description %></div>
+														<span><%- prod_detail[0].cat_name %> > <%- prod_detail[0].prod_name %> ( 구매 <%-prod_detail[0].sellcount%> 회)</span></br>
+														<span class="image">
+															<% if(prod_detail[0].img_url == "null") { %>
+																<img src="/uploads/def_prod_img.png" alt="" />
+															<% } else { %>
+																<img src="/uploads/<%-prod_detail[0].img_url%>" alt="" />
+															<% } %>
+														</span>
+														<%
+															var pre_krw = prod_detail[0].price_krw;
+															var cur_krw = prod_detail[0].price_sot * currency.sot_krw;
+															var gap_diff = cur_krw - pre_krw;
+															var gap_percent = (gap_diff*100/pre_krw).toFixed(1);
+															var gap_symbol = "";
+															if(gap_diff == 0) {
+																gap_symbol = "";
+															} else if(gap_diff < 0) {
+																gap_symbol = "↓";
+															} else {
+																gap_symbol = "↑";
+															}
+														%>
+														<%- prod_detail[0].price_sot.toFixed(2) %> SOT (등록가 <%- pre_krw %> 원, 현재 <%- cur_krw.toFixed(0) %> 원 / <%-gap_percent%>% <%-gap_symbol%> ) <br>
+
+														택배여부 Y/N : <span><%- prod_detail[0].logistics_yn %></span> </br></br>
+														상품설명 : <br>
+														<div id="prod_preview" class="box"><%if(prod_detail[0].description == "null"){%><%}else{%> <%-prod_detail[0].description%> <%}%></div>
 
 														Seller Name : <span><%- prod_detail[0].seller_name %></span> </br>
 														Seller Email : <span><%- prod_detail[0].seller_email %></span> </br></br>
 
-														<input type="button" id="product_buy" value="Buy this" onclick="buy_product(<%-prod_detail[0].id%>)"> <input type="button" id="product_add_fav" value="Add to favorite" onclick="add_product_fav(<%-prod_detail[0].id%>)">
+														<input type="button" id="product_buy" value="Buy this" onclick="buy_product(<%-prod_detail[0].id%>)">
+														<% if(prod_detail[0].fav == null) { %>
+															<span id="prod_add_fav" style="cursor:pointer" onclick="javascript:add_product_fav(<%-prod_detail[0].id%>);" value="N">즐겨찾기 추가하기</span>
+														<% } else { %>
+															<span id="prod_add_fav" style="cursor:pointer" onclick="javascript:add_product_fav(<%-prod_detail[0].id%>);" value="Y">즐겨찾기 삭제하기</span>
+														<% } %>
 
 													</form>
-													<div id="ct">here ############################</div>
+
 												</div>
 
 												<input type="hidden" id="member_id" value="<%-req.session.member_id%>">
@@ -89,6 +112,36 @@
 
 		function buy_product(buy_prod_id) {
 			checkWeb3(doBuyProduct, buy_prod_id);
+		}
+
+		function add_product_fav(prod_id){
+
+			var fav_yn_val = $("#prod_add_fav").attr("value");
+
+			var addr = "/action_fav_toggle";
+
+			$.post(addr,
+			{
+				prod_id:prod_id,
+				fav_yn:fav_yn_val
+			},
+			function(data, status){
+				if(status == "success"){
+					if (data == "NO_LOGIN") {
+						alert("즐겨찾기에 추가하려면 로그인을 먼저 해주세요!");
+					} else {
+						if(fav_yn_val == 'Y') {
+							$("#prod_add_fav").attr("value","N");
+							$("#prod_add_fav").text("즐겨찾기 추가하기");
+						} else {
+							$("#prod_add_fav").attr("value","Y");
+							$("#prod_add_fav").text("즐겨찾기 삭제하기");
+						}
+					}
+				} else {
+					alert("There's some problem . Please try it in seconds.");
+				}
+			});
 		}
 
 		function doBuyProduct(buy_prod_id){

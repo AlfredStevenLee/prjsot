@@ -37,10 +37,10 @@
 											<div class="content">
 												<div id = "regist_form">
 													<form id="member_regist_form">
-														email : <input type="text" name="member_email" id="member_email" data-validation="required email length" data-validation-length="max50"> </br>
+														email : <span id="check_email_msg"></span> <input type="text" name="member_email" id="member_email" data-validation="required email length" data-validation-length="max50"> </br>
 														password : <input type="password" name="member_password_confirmation" id="conf_password" data-validation="required length" data-validation-length="min8"> </br>
 														confirm-password : <input type="password" name="member_password" id="member_password" data-validation="confirmation"> </br>
-														name : <input type="text" name="member_name" id="member_name"> </br>
+														name : <input type="text" name="member_name" id="member_name" data-validation="required"> </br>
 														<input type="submit" id="member_regist" value="Register">
 												</form>
 												</div>
@@ -65,6 +65,11 @@
   <!--자바스크립트 기입부-->
 
 	<script>
+
+	$(document).ready(function(){
+		$("#member_email").blur(check_email_dup);
+	});
+
 		$.validate({
 	    form : '#member_regist_form',
 	    modules : 'security',
@@ -75,10 +80,43 @@
 	    }
 	  });
 
+		function check_email_dup() {
+			$('#member_email').validate(function(valid, elem) {
+   			//alert('Element '+elem.name+' is '+( valid ? 'valid' : 'invalid'));
+				if(valid) {
+					var addr = "/action_check_member_email";
+					var email = $("#member_email").val();
+
+					if (email != "") {
+						$.post(addr,
+						{
+							member_email : $("#member_email").val()
+						},
+						function(data, status){
+							if(status == "success"){
+								if (data == "CHECK_OK") {
+									$("#check_email_msg").html("Can use this email");
+									$("#check_email_msg").css("color", "blue");
+								} else {
+									$("#check_email_msg").html("This email is exist. Please type another one.");
+									$("#check_email_msg").css("color", "red");
+								}
+							} else {
+								alert("There's some problem . Please try it in seconds.");
+							}
+						});
+				  }
+
+				}
+
+			});
+		}
+
 
 		function submit_member() {
 			var addr = "/action_register_member";
 			var email = $("#member_email").val();
+
 			$.post(addr,
 			{
 				member_email : $("#member_email").val(),
@@ -92,6 +130,7 @@
 					alert("There's some problem . Please try it in seconds.");
 				}
 			});
+
 		}
 
 	</script>

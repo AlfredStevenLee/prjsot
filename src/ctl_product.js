@@ -4,6 +4,59 @@ var common_util = require("./ctl_util");
 //메인 컨트롤러 파일
 //아래와 같이 export를 통해 하나씩 메소드를 지정하고 그 내부에서 렌더링 할 파일로 redirection하면서 결과값을 함게 보내 줌
 
+exports.fav_toggle = function(req, res) {
+  var param = req.body;
+
+  var prod_id = param.prod_id;
+  var fav_yn = param.fav_yn;
+  var member_id = req.session.member_id;
+
+  //console.log(">> fav start!")
+  if (member_id == null) {
+    //console.log(">> fav no login!")
+    res.send("NO_LOGIN");
+    return false;
+  }
+  //console.log(">> fav login! - continue")
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "null";
+    if(fav_yn == "Y") {
+      sql = "delete from favorite where member_id=? and prod_id=? ";
+    } else {
+      sql = "insert into favorite values(?, ?, now()) ";
+    }
+
+    //var param = req.body;
+    //console.log(">> start register");
+
+    //Execute SQL
+    connection.query(sql, [member_id, prod_id] , function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : "+err_sql);
+        throw err;
+      }
+      //Send result & Redirect to view. Something have to be sent back
+      res.send("RESIGT_SUCCESS");
+
+      //Release connection
+      connection.release();
+    })
+  })
+};
+
 exports.register_product = function(req, res) {
   var param = req.body;
 
@@ -94,7 +147,7 @@ exports.prod_list = function(req, res, callback) {
     }
 
     //Make Query
-    var sql = "select id, prod_name, img_url, price_krw, price_sot, price_eth, logistics_yn from product where active_yn = 'Y' ";
+    var sql = "select a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn, count(b.prod_id) as sellcount from product a left outer join contract b on b.prod_id = a.id where a.active_yn = 'Y' group by a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn ";
 
     //Execute SQL
     connection.query(sql, function(err_sql, rows)
@@ -155,6 +208,7 @@ exports.contract_list_buyer = function(req, res, callback) {
 
 exports.prod_view = function(req, res, callback) {
   var prod_id = req.query.prod_id;
+  var member_id = req.session.member_id;
 
   //getConnection
   dbpool.getConnection(function(err, connection){
@@ -169,13 +223,14 @@ exports.prod_view = function(req, res, callback) {
 
     //Make Query
     var sql = "select a.id, a.cat_id, b.cd_val 'cat_name', a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, ";
-    sql += "a.description, a.logistics_yn, a.active_yn, a.register_id 'seller_id', c.email 'seller_email', c.name 'seller_name', d.payment_wallet_addr ";
-    sql += "from product a, code b, member c, provider d ";
+    sql += "a.description, a.logistics_yn, a.active_yn, a.register_id 'seller_id', c.email 'seller_email', c.name 'seller_name', d.payment_wallet_addr, count(e.prod_id) as sellcount, ";
+    sql += "(select 'Y' from favorite g where g.member_id = ? and g.prod_id = a.id) as fav ";
+    sql += "from product a left outer join contract e on e.prod_id = a.id, code b, member c, provider d  ";
     sql += "where a.id = ? and a.cat_id = b.cd and b.cd_group = 'PROD_CAT' and c.id = a.register_id and d.register_id = a.register_id ";
 
     //console.log(">> prod selected : "+prod_id);
     //Execute SQL
-    connection.query(sql, prod_id, function(err_sql, rows)
+    connection.query(sql, [member_id, prod_id], function(err_sql, rows)
     {
       //var result_str = "";
       if (err_sql)

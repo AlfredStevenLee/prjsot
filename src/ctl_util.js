@@ -94,6 +94,13 @@ exports.sendmailByAdmin = function(req, res, _to, _subject, _body, callback) {
 
 };
 
+exports.getHash = function(_input) {
+  var crypto = require('crypto');
+  var result = crypto.createHash('md5').update(_input).digest("hex");
+  //console.log(">> hashed password : "+result);
+  return result;
+};
+
 exports.getVerificationSecid = function(_email) {
   var crypto = require('crypto');
   var data = _email + Math.round((Math.random()*100)+Math.floor(new Date()/1000));
@@ -172,6 +179,53 @@ exports.prod_category = function(req, res, default_val, callback) {
       //Release connection
       connection.release();
       callback(null, result_str);
+
+    });
+  });
+};
+
+
+exports.get_currency = function(req, res, callback) {
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      console.log(">> can't get sql connection!");
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "select eth_krw, sot_krw from currency order by id desc limit 0,1 ";
+
+    //Execute SQL
+    connection.query(sql, function(err_sql, rows)
+    {
+      var results = {"eth_krw":"0", "sot_krw":"0"};
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql");
+        throw err;
+      }
+
+      //Send result & Redirect to view
+      if(rows.length == 0)
+      {
+        //Login failed
+        console.log(">> sql no rows from currency!");
+      }
+      else
+      {
+        results = {"eth_krw":rows[0].eth_krw, "sot_krw":rows[0].sot_krw};
+      }
+
+      //Release connection
+      connection.release();
+      callback(null, results);
 
     });
   });

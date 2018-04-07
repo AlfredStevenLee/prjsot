@@ -2348,6 +2348,18 @@
 			box-shadow: none;
 		}
 
+		input[type="text"]:read-only,
+		input[type="password"]:read-only,
+		input[type="email"]:read-only,
+		input[type="tel"]:read-only,
+		input[type="search"]:read-only,
+		input[type="url"]:read-only,
+		select:read-only,
+		textarea:read-only {
+			background-color : #e6e6e6;
+			color : #808080;
+		}
+
 /* 폼태그가 포커스를 받으면 보더 색상과 그림자를 준다 */
 		input[type="text"]:focus,
 		input[type="password"]:focus,
@@ -3376,6 +3388,7 @@
 
 		}
 
+		/* PC화면에서 body부의 가로 크기 설정 */
 		@media screen and (max-width: 1680px) {
 
 			.posts article {
@@ -4079,3 +4092,10 @@
 			margin-top: 0;
 			padding-top: 0;
 		}
+
+
+/*user defined css*/
+
+.box img {
+	width:100% !important;
+}

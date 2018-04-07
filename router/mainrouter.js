@@ -44,10 +44,14 @@ module.exports = function(app)
         require("../src/ctl_product").prod_view(req, res, function(err, data){
           callback(null, data);
         });
+      },function(callback){
+        require("../src/ctl_util").get_currency(req, res, function(err, data){
+          callback(null, data);
+        });
       }
     ],function(err, results) {
         //res.render('../sot_register_product.html', {req : req, res : res, common_util : results[0], common_util2 : results[1]});
-        res.render('../sot_view_product.html', {req : req, res : res, prod_detail : results[0] });
+        res.render('../sot_view_product.html', {req : req, res : res, prod_detail : results[0], currency : results[1] });
       }
     );
   });
@@ -62,10 +66,13 @@ module.exports = function(app)
         require("../src/ctl_product").prod_list(req, res, function(err, data){
           callback(null, data);
         });
+      },function(callback){
+        require("../src/ctl_util").get_currency(req, res, function(err, data){
+          callback(null, data);
+        });
       }
     ],function(err, results) {
-        //res.render('../sot_register_product.html', {req : req, res : res, common_util : results[0], common_util2 : results[1]});
-        res.render('../sot_main.html', {req : req, res : res, prod_list : results[0] });
+        res.render('../sot_main.html', {req : req, res : res, prod_list : results[0], currency : results[1] });
       }
     );
   });
@@ -106,7 +113,18 @@ module.exports = function(app)
 
 
   app.get('/config_member', function(req, res){
-    res.render('../sot_config_member.html', {req : req, res : res});
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_member").get_bizinfo(req, res, function(err, data) {
+          callback(null, data);
+        });
+      }
+    ],function(err, results) {
+        res.render('../sot_config_member.html', {req : req, res : res, bizinfo : results[0] });
+      }
+    );
   });
 
 
@@ -148,7 +166,13 @@ module.exports = function(app)
 
   app.post('/action_register_member', require("../src/ctl_member").register_member);
 
+  app.post('/action_config_member', require("../src/ctl_member").config_member);
+
+  app.post('/action_check_member_email', require("../src/ctl_member").check_member_email);
+
   app.post('/action_register_bizinfo', require("../src/ctl_member").register_bizinfo);
+
+  app.post('/action_config_bizinfo', require("../src/ctl_member").config_bizinfo);
 
   app.post('/action_login_member', require("../src/ctl_member").login_member);
 
@@ -169,15 +193,14 @@ module.exports = function(app)
         require("../src/ctl_util").prod_category(req, res, true, function(err, data){
           callback(null, data);
         });
-      } /*
-      ,function(callback){
-        require("../src/ctl_util").prod_category(req, res, function(err, data){
-          callback(null, "<option>datafrom3!!</option>"+data);
+      },function(callback){
+        require("../src/ctl_util").get_currency(req, res, function(err, data){
+          callback(null, data);
         });
-      }*/
+      }
     ],function(err, results) {
         //res.render('../sot_register_product.html', {req : req, res : res, common_util : results[0], common_util2 : results[1]});
-        res.render('../sot_register_product.html', {req : req, res : res, prod_category : results[0] });
+        res.render('../sot_register_product.html', {req : req, res : res, prod_category : results[0], currency : results[1] });
       }
     );
   });
@@ -190,5 +213,7 @@ module.exports = function(app)
   app.post('/action_cancel_contract', require("../src/ctl_product").cancel_contract);
 
   app.post('/action_find_product', require("../src/ctl_product").find_product_biz);
+
+  app.post('/action_fav_toggle', require("../src/ctl_product").fav_toggle);
 
 }

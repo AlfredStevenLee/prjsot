@@ -29,7 +29,7 @@
 							<!-- Section -->
 								<section>
 									<header class="major">
-										<h2>Configuration</h2>
+										<h2>Config user information</h2>
 									</header>
 									<div class="features">
 										<article>
@@ -37,10 +37,13 @@
 											<div class="content">
 												<div id = "regist_form">
 
+													<!-- member information config -->
 													<form id="member_config_form">
-
-														SOT Balance : <input type="text" id="sot_balance" value="Retrieving SOT balance..."> </br>
-
+														My SOT Balance : <input type="text" id="sot_balance" value="Retrieving SOT balance..." readonly> </br>
+														Email : <input type="text" name="member_email" id="member_email" data-validation="required email length" data-validation-length="max50" value="<%-req.session.member_email%>" readonly> </br>
+														Name : <input type="text" name="member_name" id="member_name" data-validation="required" value="<%-req.session.member_name%>"> </br>
+														Confirm password : <span id="update_msg"></span><input type="password" name="member_password" id="member_password" data-validation="required length" data-validation-length="min8"> </br>
+														<input type="submit" id="member_update" value="Update">
 													</form>
 
 												</div>
@@ -50,6 +53,36 @@
 									</div>
 								</section>
 
+<% if(req.session.biz && (bizinfo != null)) { %>
+								<section>
+									<header class="major">
+										<h2>Config Biz information</h2>
+									</header>
+									<div class="features">
+										<article>
+											<!--span class="icon fa-diamond"></span-->
+											<div class="content">
+												<div id = "biz_form">
+
+													<!-- biz information config -->
+													<form id="bizinfo_config_form">
+														Seller name : <input type="text" value="<%-bizinfo.provider_name%>" id="biz_provider_name" data-validation="required length" data-validation-length="min2"> </br>
+														Introduction : <input type="text" value="<%-bizinfo.description%>" id="biz_description"> </br>
+														Contact phone no. : <input type="text" value="<%-bizinfo.contact_phone%>" id="biz_contact_phone" data-validation="required"> </br>
+														Contact address : <input type="text" value="<%-bizinfo.contact_address%>" id="biz_contact_address"> </br>
+														Business registration no. : <input type="text" value="<%-bizinfo.biz_regist_no%>" id="biz_regist_no"> </br>
+														Payment wallet account : <input type="text" value="<%-bizinfo.payment_wallet_addr%> ** It will be set from your wallet automatically." id="biz_payment_wallet_addr" value="**It will be set automatically**" readonly> </br>
+														Confirm password : <span id="biz_update_msg"></span><input type="password" name="biz_member_password" id="biz_member_password" data-validation="required length" data-validation-length="min8"> </br>
+														<input type="submit" id="bizinfo_update" value="Update">
+													</form>
+
+												</div>
+
+											</div>
+										</article>
+									</div>
+								</section>
+<% } %>
 
 						</div>
 					</div>
@@ -65,42 +98,90 @@
   <!--자바스크립트 기입부-->
 
 	<script>
+
+		$(document).ready(function() {
+
+			checkWeb3(getCustBalance, "sot_balance");
+			//getCustBalance("sot_balance");
+
+		});
+
 		$.validate({
-	    form : '#member_config_form',
-	    modules : 'security',
+	    form : '#member_config_form, #bizinfo_config_form',
 	    onSuccess : function($form) {
 	      //alert('The form '+$form.attr('id')+' is valid!');
-				submit_member();
+				if($form.attr('id') == "member_config_form") {
+					submit_user_config();
+				} else if($form.attr('id') == "bizinfo_config_form") {
+					submit_biz_config();
+				}
+
 				return false;
 	    }
 	  });
 
 
-		function submit_member() {
+		function submit_user_config() {
 			var addr = "/action_config_member";
 			var email = $("#member_email").val();
 			$.post(addr,
 			{
-				member_email : $("#member_email").val(),
-				member_password : $("#member_password").val(),
-				member_name : $("#member_name").val()
+				member_name : $("#member_name").val(),
+				member_email : email,
+				member_password : $("#member_password").val()
 			},
 			function(data, status){
 				if(status == "success"){
-					$("#regist_form").html("Regist OK! <br> Thank you for registration. <br> your email is "+email+". we sent confirmation email to you.");
+					if (data == "UPDATE_OK") {
+						$("#update_msg").html("Account updated successfully.");
+						$("#update_msg").css("color", "blue");
+					} else {
+						$("#update_msg").html("Wrong password. Please check it again.");
+						$("#update_msg").css("color", "red");
+					}
+					$("#member_password").val("");
 				} else {
 					alert("There's some problem . Please try it in seconds.");
 				}
 			});
 		}
 
-		
-		$(document).ready(function() {
+		function submit_biz_config() {
+			var wallet_account = web3.eth.accounts[0];
+			$("#biz_payment_wallet_addr").val(wallet_account);
 
-			checkWeb3(null);
-			getCustBalance("sot_balance");
+			alert("Your selected wallet account is "+wallet_account+".\n Please note this again!");
 
-		});
+			var addr = "/action_config_bizinfo";
+
+			$.post(addr,
+			{
+				provider_name : $("#biz_provider_name").val(),
+				description : $("#biz_description").val(),
+				contact_phone : $("#biz_contact_phone").val(),
+				contact_address : $("#biz_contact_address").val(),
+				biz_regist_no : $("#biz_regist_no").val(),
+				payment_wallet_addr : $("#biz_payment_wallet_addr").val(),
+				member_email : $("#member_email").val(),
+				member_password : $("#biz_member_password").val()
+			},
+			function(data, status){
+				if(status == "success"){
+					if (data == "UPDATE_OK") {
+						$("#biz_update_msg").html("Account updated successfully.");
+						$("#biz_update_msg").css("color", "blue");
+					} else {
+						$("#biz_update_msg").html("Wrong password. Please check it again.");
+						$("#biz_update_msg").css("color", "red");
+					}
+					$("#biz_member_password").val("");
+				} else {
+					alert("There's some problem . Please try it in seconds.");
+				}
+			});
+		}
+
+
 
 
 

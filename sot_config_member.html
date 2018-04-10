@@ -27,7 +27,7 @@
 							<% include ./logo_common.ejs %>
 
 							<!-- Section -->
-								<section>
+								<section id="sec_mem_conf">
 									<header class="major">
 										<h2>Config user information</h2>
 									</header>
@@ -53,8 +53,8 @@
 									</div>
 								</section>
 
+								<section id="sec_biz_conf">
 <% if(req.session.biz && (bizinfo != null)) { %>
-								<section>
 									<header class="major">
 										<h2>Config Biz information</h2>
 									</header>
@@ -81,8 +81,8 @@
 											</div>
 										</article>
 									</div>
-								</section>
 <% } %>
+								</section>
 
 						</div>
 					</div>
@@ -101,8 +101,13 @@
 
 		$(document).ready(function() {
 
-			checkWeb3(getCustBalance, "sot_balance");
+			var result = checkWeb3(getCustBalance, "sot_balance");
 			//getCustBalance("sot_balance");
+			//alert(result);
+			if(result == false) {
+				$("#sec_mem_conf").html("<ul><li>계정 설정을 하실려면 이더리움 지갑에 로그인 되어있어야 합니다.<br>Metamask나 Cipher 등 사용하고 계신 web3 지갑을 열고 로그인 해 주세요.</li></ul>");
+				$("#sec_biz_conf").css("visibility","hidden");
+			}
 
 		});
 

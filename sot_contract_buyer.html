@@ -39,9 +39,9 @@
 														<article>
 
 															<span>
-																<a href="javascript:view_prod_detail('<%- contract_list[i].id %>')" class="image">
+																<a href="javascript:view_prod_detail('<%- contract_list[i].prod_id %>')" class="image">
 																<% if(contract_list[i].img_url == "null") { %>
-																	<img src="/uploads/def_prod_img.png" alt="" />
+																	<img src="/uploads/def_prod_img.png" alt="" style="width:150px;height:150px" />
 																<% } else { %>
 																	<img src="/uploads/<%-contract_list[i].img_url%>" alt="" style="width:150px;height:150px" />
 																<% } %>
@@ -87,6 +87,11 @@
   <!--자바스크립트 기입부-->
 
 	<script>
+
+		function view_prod_detail(prod_id) {
+			//alert("선택상품코드 : "+prod_id);
+			window.location.href = "/sot_view_product?prod_id="+prod_id;
+		}
 
 		// confirm contract ---------------------------------------------------------
 		function doConfirmContract(id) {

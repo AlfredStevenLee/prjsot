@@ -8,10 +8,6 @@
   <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
   <title>SOT API Tester</title>
 
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-
 </head>
 
 <body>
@@ -19,7 +15,7 @@
   <p> 홈쇼핑은 통신 판매의 하나로, 가정에서 통신 회선을 통하여 쇼핑을 할 수 있는 서비스. <br>
       PC통신, 인터넷 통신, 쌍방향 케이블 텔레비전 등 통신망에서 다양한 상품의 전시나 광고를 보고 상품을 주문하고 대금을 신용카드나 <br>
       디지털 현금 등으로 결제하는 다양한 홈쇼핑 서비스가 개발, 시행되고 있다. 인터넷에는 무수한 상품 판매 서비스가 있는데 이것을 <br>
-      사이버 쇼핑이라고 한다. 그중에 TV 방송에 최근 유행하는 <shop-sot item='1'>패션의류</shot-sot>인 ...
+      사이버 쇼핑이라고 한다. 그중에 TV 방송에 최근 유행하는 <shop-sot item='1'>패션의류</shop-sot>인 반짝이 우주복은 복고풍으로써..
   </p>
   <p>....<br> from news...</p>
   <p>
@@ -44,6 +40,8 @@
 40~50대 구매비중이 높았던 <shop-sot item='2'>필립스 면도기</shop-sot>의 경우, 20대 주문 비중이 동일 상품의 최근 3회 방송들의 20대 주문 평균보다 두 배 가량 높았던 것으로 나타났다.
   </p>
 
+<shop-sot-apikey key="0x11f15584d03a3de3d3fc9842fe5a884efecd887c"></shop-sot-apikey>
+
 </body>
 
 
@@ -63,18 +61,31 @@
   text-decoration:none;
 }
 .sot_box{
-  position:absolute;top:0;left:0;display:none;
+  position:absolute;top:0;left:0;display:none;z-index:98;
 }
 .sot_container {
-  background:#000000;border:1px solid #cccccc;padding:4px;z-index:90;
+  background:#000000;border:1px solid #cccccc;padding:4px;z-index:95;
   display:flex;display:-webkit-flex;width:210px;height:45px;box-shadow:3px 3px 10px grey;
   border-radius: 8px;opacity:0.8;color:#ffffff;
+}
+.sot_notice_container {
+  background:#000000;border:1px solid #cccccc;padding:10px;z-index:99;
+  display:flex;display:-webkit-flex;width:300px;box-shadow:3px 3px 10px grey;
+  border-radius: 8px;opacity:0.8;color:#ffffff;
+}
+.sot_product_container {
+  background:#ffffff;border:1px solid #cccccc;padding:10px;z-index:90;
+  display:flex;display:-webkit-flex;width:100px;box-shadow:3px 3px 10px grey;
+  border-radius: 8px;opacity:0.8;color:#000000;flex-direction:column;-webkit-flex-direction:column;
 }
 .sot_prod_img {
   width:20%;border-radius:5px;
 }
 .sot_content_container {
   font-size:9pt;padding-left:2px;
+}
+.sot_product_container {
+  font-size:9pt;padding-left:2px;padding-left:5px;
 }
 .sot_prod_name {
   padding:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:150px;
@@ -88,6 +99,17 @@
 .sot_prod_detail {
   width:120px;text-align:right;padding:0;margin:0;
 }
+.sot_product_item {
+  border-bottom: solid 0.3px #cccccc;
+  padding-bottom: 5px;
+  padding-top: 3px;
+  font-weight: bold;
+  overflow:hidden;
+  text-overflow: ellipsis;
+  white-space:nowrap;
+  width:85%;
+  cursor:pointer;
+}
 #sot_view_more{
   color:white;
 }
@@ -97,19 +119,57 @@
 </style>
 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
+//제휴사업자 api 연계를 위한 키 설정. ready시에 할당됨
+var g_apikey;
 
 $(document).ready(function(){
   //var shoptag = $("shop-sot").toArray();
   //alert(shoptag.length);
 
+  g_apikey = $("shop-sot-apikey").attr("key");
+  //alert(g_apikey);
+
+  //SOT shop 태그 기본 설정부
   $("shop-sot").addClass("shop");
   $("shop-sot").before("<span style='font-size:5pt;color:red;font-weight:bold;vertical-align:super'>SOT</span>");
-  $("shop-sot").mouseenter(sot_find_product);
+  $("shop-sot").mouseenter(function(){sot_find_product($(this),"BOTTOM");});
   $("body").append("<div id='sot_box' class='sot_box'><div id='sot_container' class='sot_container'><img id='sot_prod_img' src='http://127.0.0.1:8080/uploads/dummy.jpg' class='sot_prod_img'><div class='sot_content_container'><div id='sot_prod_name' class='sot_prod_name'>Product name is ..</div><div class='sot_prod_content'><div id='sot_prod_price' class='sot_prod_price'>Price is 000 SOT</div><div id='sot_prod_detail' class='sot_prod_detail'><a href='#' id='sot_view_more' target='_blank'>more</a></div></div></div></div></div>");
   $("#sot_box").mouseleave(function(){
-    //$(this).css("visibility", "hidden");
     $(this).fadeOut("fast");
+  });
+
+
+  //SOT 알림 메시지 출력부분
+  $("body").append("<div id='sot_notice_box' class='sot_box' style='minwidth:30%'><div id='sot_notice_content' class='sot_notice_container'>SOT Notice Area.</div></div>");
+  $("#sot_notice_box").css("top", ($(window).height()/2 - 80));
+  $("#sot_notice_box").css("left", $(window).width()/2 - 170);
+  $("#sot_notice_content").html("지금 이 페이지에는 SOT 코인으로 구매 가능한 "+$("shop-sot").length+"개의 최저가 상품이 있습니다. <br><br>SOT 링크에서 확인하세요!");
+  $("#sot_notice_box").fadeIn("slow");
+  setTimeout("hideMsgNotice()",2500);
+
+
+  //SOT product box 생성부분
+  $("body").append("<div id='sot_prod_box' class='sot_box' style='minwidth:30%;z-index:93'><div id='sot_product_content' class='sot_product_container'></div></div>");
+  $("#sot_product_content").append("<div style='margin-bottom:10px;font-size:12pt'>-SOT shop-</div>");
+  $("shop-sot").each(function(){
+    var item = $(this).attr("item");
+    if(item == undefined) {
+      $("#sot_product_content").append("<shop-sot-prodbox class='sot_product_item'>"+$(this).text()+"</shop-sot-prodbox>");
+    } else {
+      $("#sot_product_content").append("<shop-sot-prodbox class='sot_product_item' item='"+item+"'>"+$(this).text()+"</shop-sot-prodbox>");
+    }
+  });
+
+  $("#sot_prod_box").css("position", "fixed");
+  $("#sot_prod_box").css("top", 10);
+  $("#sot_prod_box").css("left", $(window).width() - 100);
+  $("shop-sot-prodbox").mouseenter(function(){sot_find_product($(this),"LEFT");});
+  $("#sot_prod_box").fadeIn("slow");
+
+  $(window).resize(function(){
+    $("#sot_prod_box").css("left", $(window).width() - 100);
   });
 
   /*
@@ -145,38 +205,67 @@ $(document).ready(function(){
   */
 });
 
+function hideMsgNotice() {
+  $("#sot_notice_box").fadeOut("slow");
+}
 
-function sot_find_product() {
-  //alert($(this).attr("item"));
+//상품검색된 내용을 cache에 담았다가 재사용. 중복된 조회를 방지하기 위함
+var prodMap = {};
+
+function sot_find_product(obj, positionSystem) {
+
   var searchType;
   var searchKey;
-  var attr = $(this).attr("item");
+  var attr = obj.attr("item");
 
   if (attr == undefined) {
     searchType = "BY_NAME";
-    searchKey = $(this).text();
+    searchKey = obj.text();
   } else {
     if($.isNumeric(attr)) {
       searchType = "BY_PROD_CD";
     } else {
       searchType = "BY_CATEGORY";
     }
-    searchKey = $(this).attr("item");
+    searchKey = obj.attr("item");
   }
 
   //alert("searchType : "+searchType+" / searchKey : "+searchKey);
   //
-  var offsetSOT = $(this).offset();
+  var offsetSOT = obj.offset();
 
+
+  //Cache에서 기존 조회된 상품 상세 정보를 찾으면 이를 재활용 함
+  var hashKeyCache = searchType+"&&"+searchKey;
+  var prodCache = prodMap[hashKeyCache];
+  if(prodCache != undefined) {
+    $("#sot_prod_img").attr("src",prodCache.img_url);
+    $("#sot_prod_name").text(prodCache.prod_name);
+    $("#sot_prod_price").text(prodCache.prod_price);
+    $("#sot_view_more").attr("href",prodCache.view_more);
+
+    if(positionSystem == "BOTTOM") {
+      $("#sot_box").css("top", offsetSOT.top+20);
+      $("#sot_box").css("left", offsetSOT.left);
+      $("#sot_box").fadeIn("fast");
+    } else if (positionSystem == "LEFT") {
+      $("#sot_box").css("top", offsetSOT.top);
+      $("#sot_box").css("left", offsetSOT.left-220);
+      $("#sot_box").fadeIn("fast");
+    }
+    return false;
+  }
+
+  //Cache에 없는 경우에만 서버에서 불러옴
   //Get data from platform and set to #sot_prod_img, #sot_prod_name, #sot_prod_price, #sot_prod_id
-
+  //
   var addr = "http://127.0.0.1:8080/action_find_product";
 
   $.post(addr,
   {
     searchType : searchType,
     searchKey : searchKey,
-    ad_biz_code : "#1234qwerasdf#$%^poiu#"
+    ad_biz_code : g_apikey
   },
   function(data, status){
     if(status == "success"){
@@ -185,20 +274,35 @@ function sot_find_product() {
       if(data == "NO_DATA") {
         alert("NO DATA FOUND");
       } else {
-        $("#sot_prod_img").attr("src","http://127.0.0.1:8080/uploads/"+data[0].img_url);
-        $("#sot_prod_name").text(data[0].prod_name);
-        $("#sot_prod_price").text(data[0].price_sot+" SOT");
-        //$("#sot_prod_id").val(data[0].id);
-        $("#sot_view_more").attr("href","http://127.0.0.1:8080/sot_view_product?prod_id="+data[0].id);
+        var img_url = "http://127.0.0.1:8080/uploads/"+data[0].img_url;
+        var prod_name = data[0].prod_name;
+        var prod_price = data[0].price_sot+" SOT";
+        var view_more = " http://127.0.0.1:8080/sot_view_product?prod_id="+data[0].id+"&ad_biz_code="+g_apikey;
 
-        //alert($("#sot_view_more").attr("href"));
+        $("#sot_prod_img").attr("src",img_url);
+        $("#sot_prod_name").text(prod_name);
+        $("#sot_prod_price").text(prod_price);
+        $("#sot_view_more").attr("href",view_more);
+
+        var hashKey = searchType+"&&"+searchKey;
+        var prodObj = new Object();
+        prodObj.img_url = img_url;
+        prodObj.prod_name = prod_name;
+        prodObj.prod_price = prod_price;
+        prodObj.view_more = view_more;
+        prodMap[hashKey] = prodObj;
 
         //View the result
+        if(positionSystem == "BOTTOM") {
+          $("#sot_box").css("top", offsetSOT.top+20);
+          $("#sot_box").css("left", offsetSOT.left);
+          $("#sot_box").fadeIn("fast");
+        } else if (positionSystem == "LEFT") {
+          $("#sot_box").css("top", offsetSOT.top);
+          $("#sot_box").css("left", offsetSOT.left-220);
+          $("#sot_box").fadeIn("fast");
+        }
 
-        //$("#sot_container").css("visibility", "visible");
-        $("#sot_box").css("top", offsetSOT.top+20);
-        $("#sot_box").css("left", offsetSOT.left);
-        $("#sot_box").fadeIn("fast");
 
       }
     } else {

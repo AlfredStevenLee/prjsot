@@ -133,6 +133,42 @@ exports.register_product_edit_image = function(req, res) {
 };
 
 
+exports.get_favorite_list = function(req, res, callback) {
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      console.log(">> can't get sql connection!");
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "select a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn, count(b.prod_id) as sellcount from product a left outer join contract b on b.prod_id = a.id, favorite c where a.active_yn = 'Y' and a.id = c.prod_id and c.member_id = ? group by a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn ";
+
+    //Execute SQL
+    connection.query(sql, req.session.member_id ,function(err_sql, rows)
+    {
+      //var result_str = "";
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql");
+        throw err;
+      }
+
+      //Release connection
+      connection.release();
+      callback(null, rows);
+
+    });
+  });
+};
+
+
 exports.prod_list = function(req, res, callback) {
 
   //getConnection
@@ -416,14 +452,74 @@ exports.find_product_biz = function(req, res) {
       }
 
       //Send result & Redirect to view. Something have to be sent back
-      if(rows.length == 0) {
-        res.send("NO_DATA");
-      } else {
-        res.send(rows);
+      var result_rows = rows;
+
+      //console.log(">> Referer : "+req.header("Referer"));
+      //console.log(">> api_code : "+ad_biz_code);
+
+      var http_referer = req.header("Referer");
+      var remote_ip = req.ip;
+
+      sql = "insert into biz_api_history values(?,?,?,?,?,now()) ";
+      connection.query(sql, [ad_biz_code, http_referer, remote_ip, searchType, searchKey] ,function(err_sql, rows)
+      {
+        if (err_sql)
+        {
+          connection.release();
+          console.log(">> error from sql. find_product_biz / referer insert : "+err_sql);
+          throw err;
+        }
+
+        if(result_rows.length == 0) {
+          res.send("NO_DATA");
+        } else {
+          res.send(result_rows);
+        }
+
+        //Release connection
+        connection.release();
+      });
+    });
+  });
+};
+
+
+
+exports.api_prod_view_logging = function(req, res) {
+  var param = req.query;
+  var searchType = "BY_URL_VISIT";  // BY_NAME, BY_PROD_CD, BY_CATEGORY
+  var searchKey = param.prod_id;
+  var ad_biz_code = param.ad_biz_code;
+
+  //console.log(">>Find product request : "+searchType+"/"+searchKey+"/"+ad_biz_code)
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      callback(null, err);
+      throw err;
+    }
+
+    //Make Query
+    var sql = "";
+    var http_referer = req.header("Referer");
+    var remote_ip = req.ip;
+
+    sql = "insert into biz_api_history values(?,?,?,?,?,now()) ";
+    connection.query(sql, [ad_biz_code, http_referer, remote_ip, searchType, searchKey] ,function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql. find_product_biz / url visit insert : "+err_sql);
+        throw err;
       }
 
       //Release connection
       connection.release();
-    })
-  })
+    });
+
+  });
 };

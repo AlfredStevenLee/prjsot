@@ -36,6 +36,11 @@ module.exports = function(app)
 
 
   app.get('/sot_view_product', function(req, res){
+    //console.log(">>sot_view_product biz code check : "+req.query.ad_biz_code);
+
+    if(req.query.ad_biz_code != undefined) {
+      require("../src/ctl_product").api_prod_view_logging(req, res);
+    }
 
     var async = require('async');
 
@@ -107,6 +112,26 @@ module.exports = function(app)
       }
     ],function(err, results) {
         res.render('../sot_contract_buyer.html', {req : req, res : res, contract_list : results[0] });
+      }
+    );
+  });
+
+
+  app.get('/favorite_product', function(req, res){
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").get_favorite_list(req, res, function(err, data) {
+          callback(null, data);
+        });
+      },function(callback){
+        require("../src/ctl_util").get_currency(req, res, function(err, data){
+          callback(null, data);
+        });
+      }
+    ],function(err, results) {
+        res.render('../sot_favorite_product.html', {req : req, res : res, favorite : results[0],  currency : results[1] });
       }
     );
   });

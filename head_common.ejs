@@ -78,7 +78,7 @@ function checkWeb3(callbackFunc, param) {
 	//metamsk 로그인 여부 체크
 	var myAccount = web3.eth.accounts[0];
 	if (typeof myAccount == 'undefined') {
-		alert('Please unlock metamask first');
+		alert('Metamask, Cipher등 이더리움 지갑을 열고 먼저 로그인해 주세요!');
 		return false;
 	}
 
@@ -111,17 +111,19 @@ function checkWeb3(callbackFunc, param) {
 			alert("Please use main network!");
 			return false;
 		} else {
-
       if (callbackFunc != null) {
         if (typeof callbackFunc == "function") {
           if (param == null) {
             callbackFunc();
+            return true;
           } else {
             callbackFunc(param);
+            return true;
           }
         }
+      } else {
+        return true;
       }
-
 		}
 	});
 }

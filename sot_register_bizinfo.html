@@ -101,7 +101,7 @@
 				if(status == "success"){
 					$("#regist_form").html("Biz information was updated.");
 					alert("Thank you for registration. You can sell your precious products from now.\n This window will be reloaded to main page for biz support menu in a second! ");
-					setTimeout(window.location.replace("/sotmain"),2000);
+					setTimeout("window.location.replace('/sotmain')",4000);
 				} else {
 					alert("There's some problem . Please try it in seconds.");
 				}

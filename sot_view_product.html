@@ -71,7 +71,8 @@
 														Seller Name : <span><%- prod_detail[0].seller_name %></span> </br>
 														Seller Email : <span><%- prod_detail[0].seller_email %></span> </br></br>
 
-														<input type="button" id="product_buy" value="Buy this" onclick="buy_product(<%-prod_detail[0].id%>)">
+														<input type="button" id="product_buy" value="Buy this" onclick="<% if (req.session.login) { %> buy_product(<%-prod_detail[0].id%>) <% } else { %> doLoginAlarm() <% } %>">
+
 														<% if(prod_detail[0].fav == null) { %>
 															<span id="prod_add_fav" style="cursor:pointer" onclick="javascript:add_product_fav(<%-prod_detail[0].id%>);" value="N">즐겨찾기 추가하기</span>
 														<% } else { %>
@@ -109,6 +110,10 @@
 
   <!--자바스크립트 기입부-->
 	<script>
+
+		function doLoginAlarm() {
+			alert("상품을 구매하실려면 먼저 로그인해 주세요!");
+		}
 
 		function buy_product(buy_prod_id) {
 			checkWeb3(doBuyProduct, buy_prod_id);

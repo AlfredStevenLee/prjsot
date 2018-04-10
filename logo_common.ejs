@@ -7,7 +7,7 @@
   <div class="register" style="text-align:right;padding-top: 35px">
 
     <% if (req.session.login) { %>
-      <%= req.session.member_email %> / <a href="#" onclick="submit_logout()"> Log out </a>
+      <%= req.session.member_name %> / <a href="#" onclick="submit_logout()"> Log out </a>
     <% } else { %>
         <a href="/login_member"> Log in </a> / <a href ="/register_member" style=""> Register </a>
     <% } %>

@@ -87,6 +87,26 @@ module.exports = function(app)
     );
   });
 
+  app.get('/sot_my_product', function(req, res){
+
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").my_biz_product(req, res, function(err, data){
+          callback(null, data);
+        });
+      },function(callback){
+        require("../src/ctl_util").get_currency(req, res, function(err, data){
+          callback(null, data);
+        });
+      }
+    ],function(err, results) {
+        res.render('../sot_my_product.html', {req : req, res : res, prod_list : results[0], currency : results[1] });
+      }
+    );
+  });
+
 
   app.get('/sotmain', function(req, res){
 
@@ -118,10 +138,13 @@ module.exports = function(app)
         require("../src/ctl_product").prod_list(req, res, function(err, data){
           callback(null, data);
         });
+      },function(callback){
+        require("../src/ctl_util").get_currency(req, res, function(err, data){
+          callback(null, data);
+        });
       }
     ],function(err, results) {
-        //res.render('../sot_register_product.html', {req : req, res : res, common_util : results[0], common_util2 : results[1]});
-        res.render('../sot_product_list.html', {req : req, res : res, prod_list : results[0] });
+        res.render('../sot_product_list.html', {req : req, res : res, prod_list : results[0], currency : results[1] });
       }
     );
   });
@@ -158,6 +181,30 @@ module.exports = function(app)
       }
     ],function(err, results) {
         res.render('../sot_favorite_product.html', {req : req, res : res, favorite : results[0],  currency : results[1] });
+      }
+    );
+  });
+
+
+  app.get('/modify_product', function(req, res){
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").get_prod_full(req, res, function(err, data) {
+          callback(null, data);
+        });
+      },function(callback){
+        require("../src/ctl_util").prod_category(req, res, true, function(err, data){
+          callback(null, data);
+        });
+      },function(callback){
+        require("../src/ctl_util").get_currency(req, res, function(err, data){
+          callback(null, data);
+        });
+      }
+    ],function(err, results) {
+        res.render('../sot_modify_product.html', {req : req, res : res, prod : results[0], prod_category : results[1], currency : results[2] });
       }
     );
   });
@@ -229,6 +276,8 @@ module.exports = function(app)
 
   //상품대표이미지 등록 : file upload시 코딩 패턴
   app.post('/action_register_product', upload.single('prod_img'), require("../src/ctl_product").register_product);
+
+  app.post('/action_modify_product', upload.single('prod_img'), require("../src/ctl_product").modify_product);
 
   //상품설명이미지 등록 : summernote에서 발송
   app.post('/action_edit_product_image', upload.single('imagefile'), require("../src/ctl_product").register_product_edit_image);

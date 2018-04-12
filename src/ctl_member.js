@@ -318,16 +318,29 @@ exports.register_bizinfo = function(req, res) {
         throw err_sql;
       }
 
-      var session = req.session;
-      session.biz = true;
+      //Get biz_id
+      sql = "select id from provider where register_id = ? ";
+      connection.query(sql, req.session.member_id , function(err_sql, rows)
+      {
+        if (err_sql)
+        {
+          connection.release();
+          console.log(">> error from sql");
+          throw err_sql;
+        }
 
-      //Send result & Redirect to view. Something have to be sent back
-      res.send("RESIGT_SUCCESS");
+        var session = req.session;
+        session.biz = true;
+        session.biz_id = rows[0].id;
 
-      //Release connection
-      connection.release();
-    })
-  })
+        //Send result & Redirect to view. Something have to be sent back
+        res.send("RESIGT_SUCCESS");
+
+        //Release connection
+        connection.release();
+      });
+    });
+  });
 };
 
 

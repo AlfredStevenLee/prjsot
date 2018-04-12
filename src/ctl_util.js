@@ -50,7 +50,7 @@ exports.getCurrencyInfo = function(currency) {
             {
               connection.release();
               console.log(">> error from sql");
-              throw err;
+              throw err_sql;
             }
 
             //Release connection
@@ -139,8 +139,8 @@ exports.prod_category = function(req, res, default_val, callback) {
     {
       console.log(">> can't get sql connection!");
       connection.release();
-      callback(null, err);
-      throw err;
+      callback(err, null);
+      return false;
     }
 
     //Make Query
@@ -154,7 +154,7 @@ exports.prod_category = function(req, res, default_val, callback) {
       {
         connection.release();
         console.log(">> error from sql");
-        throw err;
+        throw err_sql;
       }
 
       //Send result & Redirect to view
@@ -176,6 +176,8 @@ exports.prod_category = function(req, res, default_val, callback) {
         }
       }
 
+      //console.log(result_str);
+
       //Release connection
       connection.release();
       callback(null, result_str);
@@ -194,8 +196,8 @@ exports.get_currency = function(req, res, callback) {
     {
       console.log(">> can't get sql connection!");
       connection.release();
-      callback(null, err);
-      throw err;
+      callback(err, null);
+      return false;
     }
 
     //Make Query
@@ -209,7 +211,7 @@ exports.get_currency = function(req, res, callback) {
       {
         connection.release();
         console.log(">> error from sql");
-        throw err;
+        throw err_sql;
       }
 
       //Send result & Redirect to view

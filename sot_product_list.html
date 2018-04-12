@@ -26,33 +26,48 @@
 							<% include ./logo_common.ejs %>
 
 							<!-- Section -->
-								<section>
-									<header class="major">
-										<h2>Product list</h2>
-									</header>
+							<section>
+								<header class="major">
+									<h2>New Products</h2>
+								</header>
 
-									<div class="posts">
+								<div class="posts">
 
-										<% for(var i=0; i < prod_list.length; i++ ) { %>
+									<% for(var i=0; i < prod_list.length; i++ ) { %>
 
-											<article>
-												<a href="javascript:view_prod_detail('<%- prod_list[i].id %>')" class="image">
-												<% if(prod_list[i].img_url == "null") { %>
-													<img src="/uploads/def_prod_img.png" alt="" />
-												<% } else { %>
-													<img src="/uploads/<%-prod_list[i].img_url%>" alt="" />
-												<% } %>
-											  </a>
-												<p> <%- prod_list[i].prod_name %> </p>
-												<span><%- prod_list[i].price_sot %> SOT (<%- prod_list[i].price_krw %> KRW)</span>
-												<div>구매 ...</div>
-											</article>
+										<article>
+											<a href="javascript:view_prod_detail('<%- prod_list[i].id %>')" class="image">
+											<% if(prod_list[i].img_url == "null") { %>
+												<img src="/uploads/def_prod_img.png" alt="" />
+											<% } else { %>
+												<img src="/uploads/<%-prod_list[i].img_url%>" alt="" />
+											<% } %>
+											</a>
+											<p> <%- prod_list[i].prod_name %> </p>
+											<%
+												var pre_krw = prod_list[i].price_krw;
+												var cur_krw = prod_list[i].price_sot * currency.sot_krw;
+												var gap_diff = cur_krw - pre_krw;
+												var gap_percent = (gap_diff*100/pre_krw).toFixed(1);
+												var gap_symbol = "";
+												if(gap_diff == 0) {
+													gap_symbol = "";
+												} else if(gap_diff < 0) {
+													gap_symbol = "↓";
+												} else {
+													gap_symbol = "↑";
+												}
+											%>
+											<span>
+												판매가격 : <%- prod_list[i].price_sot.toFixed(2) %> SOT (등록가 <%- pre_krw %> 원, 현재 <%- cur_krw.toFixed(0) %> 원 / <%-gap_percent%>% <%-gap_symbol%> )
+											</span>
+											<div>구매 <%- prod_list[i].sellcount %> 회</div>
+										</article>
 
-										<% } %>
+									<% } %>
 
-  						   </div>
-
-							</section>
+								</div>
+						</section>
 					</div>
 
 				<!-- 왼쪽 사이드바 include 부분 -->

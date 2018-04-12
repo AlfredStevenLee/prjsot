@@ -43,20 +43,23 @@
               <ul>
                 <li><a href="/config_member">계정설정</a></li>
 
-                <% if (req.session.login && !req.session.biz) { %>
+                <% if (!req.session.biz) { %>
                   <li><a href="/register_bizinfo">판매자등록</a></li>
+                <% } %>
+                <% if (req.session.biz) { %>
+                  <li><a href="/sot_my_product">판매상품관리</a></li>
                 <% } %>
 
                 <li><a href="/contract_buyer">구매계약리스트</a></li>
                 <li><a href="/favorite_product">관심상품</a></li>
                 <li><a href="#">회원탈퇴</a></li>
                 <li><a href="#">알람 및 메시지</a></li>
-
+                <% if (req.session.biz) { %>
+                  <li><a href="/api_setting">SOT API셋팅</a></li>
+                <% } %>
               </ul>
             </li>
             <% } %>
-            
-            <li><a href="/api_setting">SOT API셋팅</a></li>
 
           </ul>
         </nav>

@@ -17,21 +17,47 @@ module.exports = function(app)
   var upload = multer({ storage : storage, limits : {fileSize:'50mb'}});
 
 
-
   //라우터 시작시 스케줄러 자동시작    [초] 분 시 일 월 요일
   var schedule = require('node-schedule');
   var j = schedule.scheduleJob('*/10 * * * *', function(){   // _부분은 지울 것  /5은 매 5초, 매분을 의미 -> 현재 매 10분 마다
     require("../src/ctl_util").getCurrencyInfo("ETH");
   });
 
-
-
+  //test page
   app.get('/', function(req, res){
     res.render('sot_index.html', {req : req, res : res});
   });
 
+  //url integration tester
+  app.get('/sot_tester', function(req, res){
+    res.render('sot_index_tester.html', {req : req, res : res});
+  });
+  //test용
+  app.get('/index_style', function(req, res){
+    res.render('../index_style.html', {req : req, res : res});
+  });
+
   app.get('/about', function(req, res){
     res.render('about.html', {req : req, res : res});
+  });
+
+  app.get('/api_setting', function(req, res){
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").prod_list_api(req, res, function(err, data){
+          callback(err, data);
+        });
+      },function(callback){
+        require("../src/ctl_member").get_biz_wallet(req, res, function(err, data){
+          callback(err, data);
+        });
+      }
+    ],function(err, results) {
+        res.render('../sot_config_api.html', {req : req, res : res, prod_list : results[0], biz_wallet : results[1] });
+      }
+    );
   });
 
 
@@ -237,8 +263,14 @@ module.exports = function(app)
 
   app.post('/action_cancel_contract', require("../src/ctl_product").cancel_contract);
 
-  app.post('/action_find_product', require("../src/ctl_product").find_product_biz);
-
   app.post('/action_fav_toggle', require("../src/ctl_product").fav_toggle);
+
+  // API용 router
+  app.post('/action_find_product', require("../src/ctl_product").api_find_product_biz);
+  app.get('/sot_api_integrator', require("../src/ctl_product").api_integration_by_url);
+  /* url기반 api호출 예제 : http://127.0.0.1:8080/sot_api_integrator?siteurl=http://127.0.0.1:8080/sot_tester */
+
+
+
 
 }

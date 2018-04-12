@@ -15,8 +15,8 @@ exports.verify_member = function(req, res, callback) {
     {
       console.log(">> can't get sql connection!");
       connection.release();
-      callback(null, err);
-      throw err;
+      callback(err, null);
+      return false;
     }
 
     //Make Query
@@ -31,7 +31,8 @@ exports.verify_member = function(req, res, callback) {
       {
         connection.release();
         console.log(">> error from sql : verify member select data : "+err_sql);
-        throw err;
+        callback(err_sql, null);
+        return false;
       }
 
       if(rows.length == 0) {
@@ -57,7 +58,8 @@ exports.verify_member = function(req, res, callback) {
           {
             connection.release();
             console.log(">> error from sql : verify_member update to Y : "+err_sql);
-            throw err;
+            callback(err_sql, null);
+            return false;
           }
 
           //Release connection
@@ -87,8 +89,8 @@ exports.get_bizinfo = function(req, res, callback) {
       {
         console.log(">> can't get sql connection!");
         connection.release();
-        callback(null, err);
-        throw err;
+        callback(err, null);
+        return false;
       }
 
       //Make Query
@@ -118,7 +120,8 @@ exports.get_bizinfo = function(req, res, callback) {
         {
           connection.release();
           console.log(">> error from sql : get bizinfo : "+err_sql);
-          throw err;
+          callback(err_sql, null);
+          return false;
         }
 
         callback(null, rows[0]);
@@ -139,7 +142,6 @@ exports.check_member_email = function(req, res) {
     if (err)
     {
       connection.release();
-      callback(null, err);
       throw err;
     }
 
@@ -155,7 +157,7 @@ exports.check_member_email = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : check member email");
-        throw err;
+        throw err_sql;
       }
 
       if (rows.length == 0) {
@@ -182,7 +184,6 @@ exports.config_member = function(req, res) {
     if (err)
     {
       connection.release();
-      callback(null, err);
       throw err;
     }
 
@@ -197,7 +198,7 @@ exports.config_member = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : check member email");
-        throw err;
+        throw err_sql;
       }
 
       if (rows.length == 0) {
@@ -233,7 +234,6 @@ exports.register_member = function(req, res) {
     if (err)
     {
       connection.release();
-      callback(null, err);
       throw err;
     }
 
@@ -249,7 +249,7 @@ exports.register_member = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql");
-        throw err;
+        throw err_sql;
       }
 
       //Send verification email
@@ -275,7 +275,7 @@ exports.register_member = function(req, res) {
             {
               connection.release();
               console.log(">> error from sql");
-              throw err;
+              throw err_sql;
             } else {
               //console.log(">>sending & updating verification OK! : "+data);
 
@@ -300,7 +300,6 @@ exports.register_bizinfo = function(req, res) {
     if (err)
     {
       connection.release();
-      callback(null, err);
       throw err;
     }
 
@@ -316,7 +315,7 @@ exports.register_bizinfo = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql");
-        throw err;
+        throw err_sql;
       }
 
       var session = req.session;
@@ -359,7 +358,7 @@ exports.config_bizinfo = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : config_bizinfo #1 : "+err_sql);
-        throw err;
+        throw err_sql;
       }
 
       if (rows.length == 0) {
@@ -391,7 +390,7 @@ exports.config_bizinfo = function(req, res) {
           {
             connection.release();
             console.log(">> error from sql : config_bizinfo #2 : "+err_sql);
-            throw err;
+            throw err_sql;
           }
           res.send("UPDATE_OK");
 
@@ -429,7 +428,7 @@ exports.login_member = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : member login");
-        throw err;
+        throw err_sql;
       }
 
       //Send result & Redirect to view
@@ -469,6 +468,44 @@ exports.login_member = function(req, res) {
 
     })
   })
+};
+
+exports.get_biz_wallet = function(req, res, callback) {
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      console.log(">> can't get sql connection!");
+      connection.release();
+      callback(err, null);
+      return false;
+    }
+
+    //Make Query
+    var sql = "select payment_wallet_addr as biz_wallet from provider where register_id = ? ";
+
+    //Execute SQL
+    connection.query(sql, req.session.member_id, function(err_sql, rows)
+    {
+      //var result_str = "";
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : get_biz_wallet");
+        callback(err_sql, null);
+        return false;
+        //throw err_sql;
+        //res.redirect("http://127.0.0.1:8080/");
+      }
+
+      //Release connection
+      connection.release();
+      callback(null, rows);
+
+    });
+  });
 };
 
 exports.logout_member = function(req, res) {

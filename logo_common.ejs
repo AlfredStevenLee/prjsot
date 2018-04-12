@@ -7,9 +7,9 @@
   <div class="register" style="text-align:right;padding-top: 35px">
 
     <% if (req.session.login) { %>
-      <%= req.session.member_name %> / <a href="#" onclick="submit_logout()"> Log out </a>
+      <%= req.session.member_name %> / <a href="#" onclick="submit_logout()"> 로그아웃 </a>
     <% } else { %>
-        <a href="/login_member"> Log in </a> / <a href ="/register_member" style=""> Register </a>
+        <a href="/login_member"> 로그인 </a> / <a href ="/register_member" style=""> 회원가입 </a>
     <% } %>
 
   </div>

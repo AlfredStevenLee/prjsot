@@ -9,9 +9,9 @@
           </form-->
           <% if (req.session.login) { %>
             <%= req.session.member_email %> </br>
-            <a href="#" onclick="submit_logout()"> Log out </a>
+            <a href="#" onclick="submit_logout()"> 로그아웃 </a>
           <% } else { %>
-              <a href="/login_member"> Log in </a>
+              <a href="/login_member"> 로그인 </a>
           <% } %>
 
         </section>
@@ -19,42 +19,44 @@
       <!-- Menu -->
         <nav id="menu">
           <header class="major">
-            <h2>Menu</h2>
+            <h2>메뉴</h2>
           </header>
           <ul>
-            <li><a href="index.html">About SOT</a></li>
-            <li><a href="generic.html">Term & Codition</a></li>
-            <li><a href="elements.html">Register</a></li>
+            <li><a href="index.html">SOT 소개</a></li>
+            <li><a href="generic.html">이용약관</a></li>
+            <% if (!req.session.login) { %>
+            <li><a href="elements.html">회원가입</a></li>
+            <% } %>
             <li>
-              <span class="opener">Product Category</span>
+              <span class="opener">상품카테고리</span>
               <ul>
-                <li><a href="/sot_product_list">All category</a></li>
-                <li><a href="#">Ipsum Adipiscing</a></li>
-                <li><a href="#">Tempus Magna</a></li>
-                <li><a href="#">Feugiat Veroeros</a></li>
+                <li><a href="/sot_product_list">전체 카테고리</a></li>
               </ul>
             </li>
             <% if (req.session.login && req.session.biz) { %>
-              <li><a href="/register_product">Add Product(Biz Owner)</a></li>
+              <li><a href="/register_product">판매상품등록</a></li>
             <% } %>
 
             <% if (req.session.login) { %>
             <li>
-              <span class="opener">My Pages</span>
+              <span class="opener">마이페이지</span>
               <ul>
-                <li><a href="/config_member">Account Configuration</a></li>
+                <li><a href="/config_member">계정설정</a></li>
 
                 <% if (req.session.login && !req.session.biz) { %>
-                  <li><a href="/register_bizinfo">Register as Seller</a></li>
+                  <li><a href="/register_bizinfo">판매자등록</a></li>
                 <% } %>
 
-                <li><a href="/contract_buyer">Contract list</a></li>
-                <li><a href="/favorite_product">My favorite</a></li>
-                <li><a href="#">Termination</a></li>
-                <li><a href="#">Alarms</a></li>
+                <li><a href="/contract_buyer">구매계약리스트</a></li>
+                <li><a href="/favorite_product">관심상품</a></li>
+                <li><a href="#">회원탈퇴</a></li>
+                <li><a href="#">알람 및 메시지</a></li>
+
               </ul>
             </li>
             <% } %>
+            
+            <li><a href="/api_setting">SOT API셋팅</a></li>
 
           </ul>
         </nav>

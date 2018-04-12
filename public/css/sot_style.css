@@ -1,0 +1,66 @@
+
+.shop {
+  color:blue;
+  cursor:pointer;
+  text-decoration:underline dashed grey;
+}
+
+.shop:hover {
+  color:red;
+  cursor:pointer;
+  text-decoration:none;
+}
+.sot_box{
+  position:absolute;top:0;left:0;display:none;z-index:10200;
+}
+.sot_container {
+  background:#ffffff;border:1px solid #cccccc;padding:4px;z-index:10150;
+  display:flex;display:-webkit-flex;width:210px;height:50px;box-shadow:3px 3px 10px grey;
+  border-radius: 8px;opacity:1;color:#000000;
+}
+.sot_notice_container {
+  background:#000000;border:1px solid #cccccc;padding:10px;z-index:10100;
+  display:flex;display:-webkit-flex;width:300px;box-shadow:3px 3px 10px grey;
+  border-radius: 8px;opacity:0.8;color:#ffffff;
+}
+.sot_product_container {
+  background:#ffffff;border:1px solid #cccccc;padding:10px;z-index:10100;
+  display:flex;display:-webkit-flex;width:100px;box-shadow:3px 3px 10px grey;
+  border-radius: 8px;opacity:0.8;color:#000000;flex-direction:column;-webkit-flex-direction:column;
+  font-size:9pt;padding-left:5px;
+}
+.sot_prod_img {
+  width:20%;border-radius:5px;
+}
+.sot_content_container {
+  font-size:10pt;padding-left:2px;
+}
+.sot_prod_name {
+  padding:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:150px;
+}
+.sot_prod_content {
+  padding:0;margin:5px;width:150px;display:flex;display:-webkit-flex;
+}
+.sot_prod_price {
+  width:150px;padding:0;margin:0;
+}
+.sot_prod_detail {
+  width:120px;text-align:right;padding:0;margin:0;
+}
+.sot_product_item {
+  border-bottom: solid 0.3px #cccccc;
+  padding-bottom: 5px;
+  padding-top: 3px;
+  font-weight: bold;
+  overflow:hidden;
+  text-overflow: ellipsis;
+  white-space:nowrap;
+  width:85%;
+  cursor:pointer;
+}
+#sot_view_more{
+  color:#000000;
+}
+#sot_view_more:hover{
+  color:orange;
+}

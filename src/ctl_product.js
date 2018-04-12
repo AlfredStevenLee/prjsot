@@ -24,7 +24,6 @@ exports.fav_toggle = function(req, res) {
     if (err)
     {
       connection.release();
-      callback(null, err);
       throw err;
     }
 
@@ -46,7 +45,7 @@ exports.fav_toggle = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : "+err_sql);
-        throw err;
+        throw err_sql;
       }
       //Send result & Redirect to view. Something have to be sent back
       res.send("RESIGT_SUCCESS");
@@ -92,7 +91,6 @@ exports.register_product = function(req, res) {
     if (err)
     {
       connection.release();
-      callback(null, err);
       throw err;
     }
 
@@ -108,7 +106,7 @@ exports.register_product = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : "+err_sql);
-        throw err;
+        throw err_sql;
       }
       //Send result & Redirect to view. Something have to be sent back
       res.send("RESIGT_SUCCESS");
@@ -142,8 +140,8 @@ exports.get_favorite_list = function(req, res, callback) {
     {
       console.log(">> can't get sql connection!");
       connection.release();
-      callback(null, err);
-      throw err;
+      callback(err, null);
+      return false;
     }
 
     //Make Query
@@ -157,7 +155,8 @@ exports.get_favorite_list = function(req, res, callback) {
       {
         connection.release();
         console.log(">> error from sql");
-        throw err;
+        callback(err_sql, null);
+        return false;
       }
 
       //Release connection
@@ -178,8 +177,8 @@ exports.prod_list = function(req, res, callback) {
     {
       console.log(">> can't get sql connection!");
       connection.release();
-      callback(null, err);
-      throw err;
+      callback(err, null);
+      return false;
     }
 
     //Make Query
@@ -193,12 +192,61 @@ exports.prod_list = function(req, res, callback) {
       {
         connection.release();
         console.log(">> error from sql");
-        throw err;
+        callback(err_sql, null);
+        return false;
       }
 
       //Release connection
       connection.release();
       callback(null, rows);
+
+    });
+  });
+};
+
+exports.prod_list_api = function(req, res, callback) {
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      console.log(">> can't get sql connection!");
+      connection.release();
+      callback(err, null);
+      return false;
+    }
+
+    //Make Query
+    var sql = "select id, prod_name, img_url, price_sot from product where register_id = ? ";
+
+    //Execute SQL
+    connection.query(sql, common_util.checkNullString(req.session.member_id), function(err_sql, rows)
+    {
+      var result_str = "";
+
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : prod_list_api");
+        callback(err_sql, null);
+        return false;
+      }
+
+      if(rows.length == 0)
+      {
+        result_str = "NO_DATA";
+      }
+      else
+      {
+        for(var i=0; i<rows.length; i++){
+          result_str += "<option value='"+rows[i].id+"' img_url='http://127.0.0.1:8080/uploads/"+rows[i].img_url+"' price_sot='"+rows[i].price_sot.toFixed(2)+"'>"+rows[i].prod_name+"</option>";
+        }
+      }
+
+      //Release connection
+      connection.release();
+      callback(null, result_str);
 
     });
   });
@@ -214,8 +262,8 @@ exports.contract_list_buyer = function(req, res, callback) {
     {
       console.log(">> can't get sql connection!");
       connection.release();
-      callback(null, err);
-      throw err;
+      callback(err, null);
+      return false;
     }
 
     //Make Query
@@ -230,7 +278,8 @@ exports.contract_list_buyer = function(req, res, callback) {
       {
         connection.release();
         console.log(">> error from sql");
-        throw err;
+        callback(err_sql, null);
+        return false;
       }
 
       //Release connection
@@ -253,8 +302,8 @@ exports.prod_view = function(req, res, callback) {
     {
       console.log(">> can't get sql connection!");
       connection.release();
-      callback(null, err);
-      throw err;
+      callback(err, null);
+      return false;
     }
 
     //Make Query
@@ -273,7 +322,8 @@ exports.prod_view = function(req, res, callback) {
       {
         connection.release();
         console.log(">> error from sql : prod_view : "+err_sql);
-        throw err;
+        callback(err_sql, null);
+        return false;
       }
 
       //Release connection
@@ -301,7 +351,6 @@ exports.buy_product = function(req, res) {
     if (err)
     {
       connection.release();
-      callback(null, err);
       throw err;
     }
 
@@ -320,7 +369,7 @@ exports.buy_product = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : "+err_sql);
-        throw err;
+        throw err_sql;
       }
 
       //get contract no and return it
@@ -331,7 +380,7 @@ exports.buy_product = function(req, res) {
         {
           connection.release();
           console.log(">> error from sql : "+err_sql);
-          throw err;
+          throw err_sql;
         }
         //send contract no
         //console.log("contract id : "+rows[0].cur_id);
@@ -353,7 +402,6 @@ exports.confirm_contract = function(req, res) {
     if (err)
     {
       connection.release();
-      callback(null, err);
       throw err;
     }
 
@@ -366,7 +414,7 @@ exports.confirm_contract = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : "+err_sql);
-        throw err;
+        throw err_sql;
       }
 
       //console.log("contract id : "+rows[0].cur_id);
@@ -387,7 +435,6 @@ exports.cancel_contract = function(req, res) {
     if (err)
     {
       connection.release();
-      callback(null, err);
       throw err;
     }
 
@@ -400,7 +447,7 @@ exports.cancel_contract = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : "+err_sql);
-        throw err;
+        throw err_sql;
       }
 
       //console.log("contract id : "+rows[0].cur_id);
@@ -412,7 +459,7 @@ exports.cancel_contract = function(req, res) {
   });
 };
 
-exports.find_product_biz = function(req, res) {
+exports.api_find_product_biz = function(req, res) {
   var param = req.body;
   var searchType = param.searchType;  // BY_NAME, BY_PROD_CD, BY_CATEGORY
   var searchKey = param.searchKey;
@@ -420,12 +467,17 @@ exports.find_product_biz = function(req, res) {
 
   //console.log(">>Find product request : "+searchType+"/"+searchKey+"/"+ad_biz_code)
 
+  if(ad_biz_code == undefined) {
+    console.log(">> NO_API_CODE");
+    res.send("NO_DATA");
+    return false;
+  }
+
   //getConnection
   dbpool.getConnection(function(err, connection){
     if (err)
     {
       connection.release();
-      callback(null, err);
       throw err;
     }
 
@@ -448,7 +500,7 @@ exports.find_product_biz = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql. find_product_biz : "+err_sql);
-        throw err;
+        throw err_sql;
       }
 
       //Send result & Redirect to view. Something have to be sent back
@@ -467,7 +519,7 @@ exports.find_product_biz = function(req, res) {
         {
           connection.release();
           console.log(">> error from sql. find_product_biz / referer insert : "+err_sql);
-          throw err;
+          throw err_sql;
         }
 
         if(result_rows.length == 0) {
@@ -498,7 +550,6 @@ exports.api_prod_view_logging = function(req, res) {
     if (err)
     {
       connection.release();
-      callback(null, err);
       throw err;
     }
 
@@ -514,12 +565,72 @@ exports.api_prod_view_logging = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql. find_product_biz / url visit insert : "+err_sql);
-        throw err;
+        throw err_sql;
       }
 
       //Release connection
       connection.release();
     });
 
+  });
+};
+
+
+exports.api_integration_by_url = function(req, res) {
+  //console.log("\n\n\n===============================");
+  var paramUrl = req.query.siteurl;
+
+  //check parameter exist or not
+  if (paramUrl == undefined) {
+    //console.log(">> api_integraion_by_url : NO_PARAMETER_SITE_URL");
+    res.send("ERR_NO_SITEURL_FOUND");
+    return false;
+  }
+
+  //check parameter type : http or https
+  const {URL} = require('url');
+  var urlObj = new URL(paramUrl);
+  //console.log("REQUESTED URL : "+urlObj.toString());
+  //console.log("host : "+urlObj.host);
+  //console.log("hostname : "+urlObj.hostname);
+
+  var https = null;
+  var urlprotocol = urlObj.protocol;
+
+  if(urlprotocol == "http:") {
+    //console.log("HTTP PROTOCOL");
+    https = require("http");
+  } else if(urlprotocol == "https:") {
+    //console.log("HTTPS PROTOCOL");
+    https = require("https");
+  } else {
+    res.send("ERR_NO_SUPPORTED_PROTOCOL");
+    return false;
+  }
+
+  //res.send("test ok");
+  //return false;
+
+  https.get(paramUrl, resdata => {
+    resdata.setEncoding("utf8");
+    let body = "";
+    resdata.on("data", data => {
+      body += data;
+    });
+    resdata.on("end", () => {
+      //console.log("------------------------");
+      //console.log(body);
+
+      const cheerio = require('cheerio');
+      const $ = cheerio.load(body, {decodeEntities: false});
+      $('head').append("<link rel='stylesheet' href='http://127.0.0.1:8080/css/sot_style.css' />");
+      $('head').append("<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>");
+      $('head').append("<script src='http://127.0.0.1:8080/js/sot_toolkit.js'></script>");
+      //console.log("------------------------");
+      //console.log($.html());
+
+      res.send($.html());
+
+    });
   });
 };

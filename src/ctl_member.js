@@ -293,6 +293,162 @@ exports.register_member = function(req, res) {
   })
 };
 
+
+exports.goodbye_member = function(req, res) {
+  var member_id = req.session.member_id;
+  var member_email = req.session.member_email;
+  var member_password = common_util.getHash(req.body.member_password);
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      throw err;
+    }
+    /*
+    1.패스워드가 맞는지 확인 : select id from member where id=? and password=?
+    2.진행중 계약이 있는지 확인 : select count(contract_status) from contract where (seller_id = 1 or buyer_id=1) and contract_status = 'REG';
+    3.맴버정보 삭제 : delete from member where id = ?;
+    4.사업자정보 삭제 : delete from provider where register_id = ?;
+    5.판매상품정보 비활성화 : update product set active_yn = 'N' where register_id = ?;
+    6.관심상품 삭제 : delete from favorite where member_id = ?;
+    7.세션초기화 및 페이지 리로드(client단)
+    8.email 발송
+    */
+
+    //Make Query
+    var sql1 = "select id from member where id=? and password=? ";
+    var sql2 = "select count(contract_status) as c_cnt from contract where (seller_id=? or buyer_id=?) and contract_status = 'REG' ";
+    var sql3 = "delete from member where id = ? ";
+    var sql4 = "delete from provider where register_id = ? ";
+    var sql5 = "update product set active_yn = 'N' where register_id = ? ";
+    var sql6 = "delete from favorite where member_id = ? ";
+
+    //Execute SQL
+    // SQL1-----------------------------
+    connection.query(sql1, [member_id, member_password] , function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : goodbye1");
+        throw err_sql;
+      }
+
+      if(rows.length == 0) {
+        res.send("INCORRECT_PASS");
+        connection.release();
+      } else {
+
+        //SQL2-----------------------------
+        connection.query(sql2, [member_id, member_id] , function(err_sql, rows)
+        {
+          if (err_sql)
+          {
+            connection.release();
+            console.log(">> error from sql : goodbye2");
+            throw err_sql;
+          }
+
+          if(rows[0].c_cnt > 0) {
+            res.send("REMAIN_CONTRACT");
+            connection.release();
+          } else {
+
+            //SQL3-----------------------------
+            connection.query(sql3, [member_id] , function(err_sql, rows)
+            {
+              if (err_sql)
+              {
+                connection.release();
+                console.log(">> error from sql : goodbye3");
+                throw err_sql;
+              }
+
+              //SQL4-----------------------------
+              connection.query(sql4, [member_id] , function(err_sql, rows)
+              {
+                if (err_sql)
+                {
+                  connection.release();
+                  console.log(">> error from sql : goodbye4");
+                  throw err_sql;
+                }
+
+                //SQL5-----------------------------
+                connection.query(sql5, [member_id] , function(err_sql, rows)
+                {
+                  if (err_sql)
+                  {
+                    connection.release();
+                    console.log(">> error from sql : goodbye5");
+                    throw err_sql;
+                  }
+
+                  //SQL6-----------------------------
+                  connection.query(sql6, [member_id] , function(err_sql, rows)
+                  {
+                    if (err_sql)
+                    {
+                      connection.release();
+                      console.log(">> error from sql : goodbye6");
+                      throw err_sql;
+                    }
+
+                    connection.release();
+
+                    //SESSION7----------------------------
+                    var session = req.session;
+
+                    if (session.login) {
+
+                      session.destroy(function(err){
+                        if(err) {
+                          consol.log(err);
+                          throw err;
+                        } else {
+
+                          var subject = "SOT 회원탈퇴가 정상적으로 완료되었습니다";
+
+                          var body = "<h3>그동안 많은 관심 가져주셔서 감사합니다.<h3><br><br>";
+                          body += "회원님의 개인 정보는 안전하게 잘 삭제되었습니다.<br>";
+                          body += "앞으로 다시 뵐 수 있기를 바랍니다.<br>-SOT Innovation -";
+
+                          common_util.sendmailByAdmin(req, res, member_email, subject, body, function(err, data){
+                            if (err) {
+                              console.log(">>error from goodbye member / send verification email : "+err);
+                            }
+
+                            //맴버탈퇴 마지막 성공!!!
+                            res.send("GOODBYE_SUCCESS");
+                          });
+
+                        }
+                      });
+                    }
+
+                  });
+
+                });
+
+              });
+
+            });
+
+          }
+
+        });
+
+      }
+
+    });
+
+  });
+
+};
+
+
 exports.register_bizinfo = function(req, res) {
 
   //getConnection

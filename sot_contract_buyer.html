@@ -36,19 +36,12 @@
 											<!--span class="icon fa-diamond"></span-->
 
 													<% for(var i=0; i < contract_list.length; i++ ) { %>
-														<article>
-
-															<span>
-																<a href="javascript:view_prod_detail('<%- contract_list[i].prod_id %>')" class="image">
-																<% if(contract_list[i].img_url == "null") { %>
-																	<img src="/uploads/def_prod_img.png" alt="" style="width:150px;height:150px" />
-																<% } else { %>
-																	<img src="/uploads/<%-contract_list[i].img_url%>" alt="" style="width:150px;height:150px" />
-																<% } %>
-															  </a>
-															</span>
+														<article class="article_box">
+															<a href="javascript:view_prod_detail('<%- contract_list[i].prod_id %>')" class="image">
+																<div class="small_img_box"><img src="/uploads/<%-contract_list[i].img_url%>" class="small_img_clip" /></div>
+														  </a>
 															<div class="content" style="margin-left:10px">
-																<p>
+																<div style="margin-bottom:10px">
 																	<span id="CNTR_STAT_<%- contract_list[i].id %>"><%- contract_list[i].contract_status_val %></span>
 																	<% if (contract_list[i].contract_status == "REG") { %>
 																		<span id="REG_<%- contract_list[i].id %>">
@@ -56,15 +49,10 @@
 																		<a href="javascript:doCancelContract(<%- contract_list[i].id %>)">Cancel</a>]
 																		</span>
 																	<% } %>
-																</p>
-																<p><%- contract_list[i].prod_name %></p>
-																<p><%- contract_list[i].price_sot %> SOT (<%- contract_list[i].price_krw %> KRW) </p>
-																<p>payment account : <%- contract_list[i].buyer_account_no %> </p>
-
-																<!--p>contract : <%- contract_list[i].id %> / product : <%- contract_list[i].prod_id %> </p>
-																<p>seller id : <%- contract_list[i].seller_id %> </p>
-																<p>seller acc : <%- contract_list[i].seller_account_no %> </p-->
-
+																</div>
+																<div><%- contract_list[i].prod_name %></div>
+																<div><%- contract_list[i].price_sot.toFixed(2) %> SOT (<%- contract_list[i].price_krw %> KRW) </div>
+																<div>결제지갑 : <%- contract_list[i].buyer_account_no %> </div>
 															</div>
 														</article>
 													<% } %>

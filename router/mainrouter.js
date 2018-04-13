@@ -260,6 +260,10 @@ module.exports = function(app)
     res.render('../sot_login_member.html', {req : req, res : res});
   });
 
+  app.get('/goodbye_member', function(req, res){
+    res.render('../sot_goodbye_member.html', {req : req, res : res});
+  });
+
   app.post('/action_logout_member', require("../src/ctl_member").logout_member);
 
   app.post('/action_register_member', require("../src/ctl_member").register_member);
@@ -273,6 +277,8 @@ module.exports = function(app)
   app.post('/action_config_bizinfo', require("../src/ctl_member").config_bizinfo);
 
   app.post('/action_login_member', require("../src/ctl_member").login_member);
+
+  app.post('/action_goodbye_member', require("../src/ctl_member").goodbye_member);
 
   //상품대표이미지 등록 : file upload시 코딩 패턴
   app.post('/action_register_product', upload.single('prod_img'), require("../src/ctl_product").register_product);

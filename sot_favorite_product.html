@@ -37,17 +37,10 @@
 													<!-- "select a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn, count(b.prod_id) as sellcount
 													 from product a left outer join contract b on b.prod_id = a.id, favorite c where a.active_yn = 'Y' and a.id = c.prod_id and c.member_id = ? group by a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn "; -->
 													<% for(var i=0; i < favorite.length; i++ ) { %>
-														<article>
-
-															<span>
-																<a href="javascript:view_prod_detail('<%- favorite[i].id %>')" class="image">
-																<% if(favorite[i].img_url == "null") { %>
-																	<img src="/uploads/def_prod_img.png" alt="" style="width:150px;height:150px" />
-																<% } else { %>
-																	<img src="/uploads/<%-favorite[i].img_url%>" alt="" style="width:150px;height:150px" />
-																<% } %>
-															  </a>
-															</span>
+														<article class="article_box">
+															<a href="javascript:view_prod_detail('<%- favorite[i].id %>')" class="image">
+																<div class="small_img_box"><img src="/uploads/<%-favorite[i].img_url%>" class="small_img_clip" /></div>
+														  </a>
 															<div class="content" style="margin-left:10px">
 																<%
 																	var pre_krw = favorite[i].price_krw;

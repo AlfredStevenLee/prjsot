@@ -2093,6 +2093,7 @@
 
 		}
 
+
 		@media screen and (max-width: 360px) {
 
 			body, input, select, textarea {
@@ -4096,4 +4097,35 @@
 
 .box img {
 	width:100% !important;
+}
+
+.small_img_box {
+	width:150px;
+	height:110px;
+	margin:5px
+}
+.small_img_clip {
+	height:100%;
+	position:absolute;
+	clip:rect(0px,110px,110px,0px);
+}
+.article_box {
+	background:#ffffff;
+	border:1px solid #cccccc;
+	padding:3px;
+	box-shadow:3px 3px 10px #cccccc;
+	max-height: 130px
+}
+
+@media screen and (max-width: 480px) {
+	.small_img_box {
+		width:100%;
+		height:100%;
+		margin:5px;
+	}
+	.small_img_clip {
+		width:100%;
+		height:100%;
+		position:relative;
+	}
 }

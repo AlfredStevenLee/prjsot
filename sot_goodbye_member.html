@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+
+		<!-- 공용 header 삽입 부 -->
+		<% include ./head_common.ejs %>
+
+
+	</head>
+
+
+	<body>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+							<% include ./logo_common.ejs %>
+
+							<!-- Section -->
+								<section>
+									<header class="major">
+										<h2>Goodbye</h2>
+									</header>
+									<div class="features">
+										<article>
+											<div class="content">
+												<div id = "goodbye_form">
+													<ul>
+													  <li>저희 SOT는 회원님께서 언제든 안전하고 간편하게 서비스를 탈퇴할 수 있도록 도와드립니다.</li>
+														<li>회원 탈퇴시 로그인/판매자정보 등의 주소, 이메일 등 회원님의 개인정보를 안전하고 빠르게 즉각 삭제합니다.</li>
+														<li>더욱 회원님께 도움이 되는 사이트로 보답하겠습니다. 언제든 다시 가입해 주세요.</li>
+														<li>탈퇴하시려면 아래의 "회원탈퇴" 버튼을 클릭해 주십시요.</li>
+												  </ul>
+													<div id="prg_msg" style="color:red"></div>
+													<form id="frm_goodbye">
+														<input type="password" id="member_password" data-validation="required">
+														<input type="submit" id="member_goodbye" value="회원탈퇴">
+												  </form>
+												</div>
+											</div>
+										</article>
+									</div>
+								</section>
+
+
+						</div>
+					</div>
+
+				<!-- 왼쪽 사이드바 include 부분 -->
+				<% include ./sidebar_common.ejs %>
+
+			</div>
+
+	</body>
+
+
+  <!--자바스크립트 기입부-->
+
+	<script>
+
+		$.validate({
+			form : '#frm_goodbye',
+			modules : 'security',
+			onSuccess : function($form) {
+				//alert('The form '+$form.attr('id')+' is valid!');
+				goodbye();
+				return false;
+			}
+		});
+
+		function goodbye() {
+			var addr = "/action_goodbye_member";
+			$.post(addr,
+			{
+				goodbye_yn : "MEMBER_OUT_Y",
+				member_password : $("#member_password").val()
+			},
+			function(data, status){
+				if(status == "success"){
+						if (data == "INCORRECT_PASS") {
+							$("#prg_msg").text("패스워드가 안맞습니다. 다시확인해 주세요!");
+						} else if(data == "REMAIN_CONTRACT") {
+							$("#prg_msg").html("아직 완료되지 않은 계약건이 존재합니다. 계약건을 완료하거나 취소 후 다시 시도해 주세요! <br>계약내용은 마이페이지 > 구매계약리스트에서 확인할 수 있습니다.");
+						} else {
+							$("#goodbye_form").html("회원탈퇴 처리가 안전하게 완료되었습니다. <br>감사합니다.<br><br>-SOT Innovation-");
+							setTimeout("window.location.replace('/sotmain')",2000);
+						}
+				} else {
+					alert("There's some problem . Please try it in seconds.");
+				}
+			});
+		}
+
+	</script>
+
+</html>

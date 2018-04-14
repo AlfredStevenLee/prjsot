@@ -4,7 +4,8 @@ var common_util = require("./ctl_util");
 //메인 컨트롤러 파일
 //아래와 같이 export를 통해 하나씩 메소드를 지정하고 그 내부에서 렌더링 할 파일로 redirection하면서 결과값을 함게 보내 줌
 
-exports.fav_toggle = function(req, res) {
+exports.fav_toggle = function(req, res, next) {
+
   var param = req.body;
 
   var prod_id = param.prod_id;
@@ -24,7 +25,8 @@ exports.fav_toggle = function(req, res) {
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -45,7 +47,8 @@ exports.fav_toggle = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : "+err_sql);
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
       //Send result & Redirect to view. Something have to be sent back
       res.send("RESIGT_SUCCESS");
@@ -56,7 +59,7 @@ exports.fav_toggle = function(req, res) {
   })
 };
 
-exports.register_product = function(req, res) {
+exports.register_product = function(req, res, next) {
   var param = req.body;
 
   //console.log(">>>>> req : "+param.prod_name);
@@ -91,7 +94,8 @@ exports.register_product = function(req, res) {
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -106,7 +110,8 @@ exports.register_product = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : "+err_sql);
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
       //Send result & Redirect to view. Something have to be sent back
       res.send("RESIGT_SUCCESS");
@@ -118,7 +123,7 @@ exports.register_product = function(req, res) {
 };
 
 
-exports.modify_product = function(req, res) {
+exports.modify_product = function(req, res, next) {
   var param = req.body;
 
   //console.log(">>>>> req : "+param.prod_name);
@@ -156,7 +161,8 @@ exports.modify_product = function(req, res) {
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -173,7 +179,8 @@ exports.modify_product = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : "+err_sql);
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
       //Send result & Redirect to view. Something have to be sent back
       res.send("RESIGT_SUCCESS");
@@ -483,7 +490,7 @@ exports.prod_view = function(req, res, callback) {
 };
 
 
-exports.buy_product = function(req, res) {
+exports.buy_product = function(req, res, next) {
   var param = req.body;
 
   var prod_id = param.prod_id;
@@ -499,7 +506,8 @@ exports.buy_product = function(req, res) {
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -517,7 +525,8 @@ exports.buy_product = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : "+err_sql);
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       //get contract no and return it
@@ -528,7 +537,8 @@ exports.buy_product = function(req, res) {
         {
           connection.release();
           console.log(">> error from sql : "+err_sql);
-          throw err_sql;
+          next(err_sql);
+          return false;
         }
         //send contract no
         //console.log("contract id : "+rows[0].cur_id);
@@ -541,7 +551,7 @@ exports.buy_product = function(req, res) {
   });
 };
 
-exports.confirm_contract = function(req, res) {
+exports.confirm_contract = function(req, res, next) {
   var param = req.body;
   var contract_id = param.contract_id;
 
@@ -550,7 +560,8 @@ exports.confirm_contract = function(req, res) {
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -562,7 +573,8 @@ exports.confirm_contract = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : "+err_sql);
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       //console.log("contract id : "+rows[0].cur_id);
@@ -574,7 +586,7 @@ exports.confirm_contract = function(req, res) {
   });
 };
 
-exports.cancel_contract = function(req, res) {
+exports.cancel_contract = function(req, res, next) {
   var param = req.body;
   var contract_id = param.contract_id;
 
@@ -583,7 +595,8 @@ exports.cancel_contract = function(req, res) {
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -595,7 +608,8 @@ exports.cancel_contract = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : "+err_sql);
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       //console.log("contract id : "+rows[0].cur_id);
@@ -607,7 +621,7 @@ exports.cancel_contract = function(req, res) {
   });
 };
 
-exports.api_find_product_biz = function(req, res) {
+exports.api_find_product_biz = function(req, res, next) {
   var param = req.body;
   var searchType = param.searchType;  // BY_NAME, BY_PROD_CD, BY_CATEGORY
   var searchKey = param.searchKey;
@@ -626,7 +640,8 @@ exports.api_find_product_biz = function(req, res) {
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -648,7 +663,8 @@ exports.api_find_product_biz = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql. find_product_biz : "+err_sql);
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       //Send result & Redirect to view. Something have to be sent back
@@ -667,7 +683,8 @@ exports.api_find_product_biz = function(req, res) {
         {
           connection.release();
           console.log(">> error from sql. find_product_biz / referer insert : "+err_sql);
-          throw err_sql;
+          next(err_sql);
+          return false;
         }
 
         if(result_rows.length == 0) {
@@ -685,7 +702,7 @@ exports.api_find_product_biz = function(req, res) {
 
 
 
-exports.api_prod_view_logging = function(req, res) {
+exports.api_prod_view_logging = function(req, res, next) {
   var param = req.query;
   var searchType = "BY_URL_VISIT";  // BY_NAME, BY_PROD_CD, BY_CATEGORY
   var searchKey = param.prod_id;
@@ -698,7 +715,8 @@ exports.api_prod_view_logging = function(req, res) {
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -713,7 +731,8 @@ exports.api_prod_view_logging = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql. find_product_biz / url visit insert : "+err_sql);
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       //Release connection
@@ -724,7 +743,7 @@ exports.api_prod_view_logging = function(req, res) {
 };
 
 
-exports.api_integration_by_url = function(req, res) {
+exports.api_integration_by_url = function(req, res, next) {
   //console.log("\n\n\n===============================");
   var paramUrl = req.query.siteurl;
 

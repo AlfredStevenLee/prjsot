@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+
+		<!-- 공용 header 삽입 부 -->
+		<% include ./head_common.ejs %>
+
+
+	</head>
+
+
+	<body>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+							<% include ./logo_common.ejs %>
+
+							<!-- Section -->
+								<section id="sec_mem_conf">
+									<header class="major">
+										<h2>SOT코인 환전센터</h2>
+									</header>
+									<div class="features">
+										<article>
+											<!--span class="icon fa-diamond"></span-->
+											<div class="content">
+												<div id="msg_box" style="color:red;margin-bottom:10px"></div>
+												<div id = "regist_form">
+													<form id="buy_sot_form">
+														계정주소 : <input type="text" id="my_account" value="Retrieving Account..." readonly> </br>
+														SOT 잔액 : <input type="text" id="sot_balance" value="Retrieving SOT balance..." readonly> </br>
+														SOT 구매수량 : <input type="text" name="amount_sot" id="amount_sot" data-validation="required number" > </br>
+														ETH 송금액 : <input type="text" name="amount_eth" id="amount_eth" readonly> </br>
+
+														<input type="submit" id="btn_buy_sot" value="SOT환전하기">
+													</form>
+												</div>
+
+											</div>
+										</article>
+									</div>
+								</section>
+
+						</div>
+					</div>
+
+				<!-- 왼쪽 사이드바 include 부분 -->
+				<% include ./sidebar_common.ejs %>
+
+			</div>
+
+	</body>
+
+
+  <!--자바스크립트 기입부-->
+
+	<script>
+
+		$.validate({
+			form : '#buy_sot_form',
+			modules : 'security',
+			onSuccess : function($form) {
+				//alert('The form '+$form.attr('id')+' is valid!');
+				sendTrx();
+				return false;
+			}
+		});
+
+		var txid;
+		function sendTrx() {
+			web3.eth.sendTransaction({from: $("#my_account").val() , to: "0x4d1e8926be3bf65dbfecee4c2286f797efff7c05", value: web3.toWei($("#amount_eth").val(), 'ether')} , function(e,r) {
+				txid = r;
+			});
+
+			$("#msg_box").html("<span style='color:blue'>SOT 코인 환전중입니다. 잠시만 기다려 주세요.</span>");
+
+			var filter = web3.eth.filter('latest');
+		  filter.watch(function(e, r) {
+		    //getValue();
+		    web3.eth.getTransaction(txid, function(e,r){
+		      if (r != null && r.blockNumber > 0) {
+		        $("#msg_box").html("<span style='color:blue'>SOT 환전이 완료되었습니다. 환전 확인을 위해 페이지를 다시 읽습니다. <br> 잠시만 기다려 주세요. </span>");
+		        filter.stopWatching();
+						setTimeout("window.location.replace('/exchange_sot')", 3000);
+		      }
+		   	});
+		 	});
+		}
+
+
+		var wallet_account = "NO_ACCOUNT";
+
+		$(document).ready(function() {
+
+			setInterval(function() {
+				var cur_account = web3.eth.accounts[0];
+				if (wallet_account != cur_account) {
+					set_user_env();
+				}
+			}, 500);
+
+			$("#amount_sot").keyup(function(){
+				var price_sot = $(this).val();
+				$("#amount_eth").val((price_sot/100).toFixed(6));
+			});
+
+		});
+
+		function set_user_env() {
+			var result = checkWeb3(null, null, "msg_box");
+			//alert(result);
+			if(result == true) {
+				wallet_account = web3.eth.accounts[0];
+				$("#my_account").val(wallet_account);
+				$("#sot_balance").val("Update Information...");
+				getCustBalance("sot_balance");
+				$("#btn_buy_sot").attr("disabled", false);
+			} else {
+				$("#btn_buy_sot").attr("disabled", true);
+			}
+		}
+
+
+
+
+
+	</script>
+
+</html>

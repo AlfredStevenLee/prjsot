@@ -94,6 +94,10 @@
 						},
 						function(data, status){
 							if(status == "success"){
+								if(checkRestData(data)) {
+									return false;
+								}
+
 								if (data == "CHECK_OK") {
 									$("#check_email_msg").html("Can use this email");
 									$("#check_email_msg").css("color", "blue");
@@ -125,6 +129,10 @@
 			},
 			function(data, status){
 				if(status == "success"){
+					if(checkRestData(data)) {
+						return false;
+					}
+
 					$("#regist_form").html("Thank you for registration. <br> your email is "+email+". We sent verification email to you. Please confirm it soon.");
 				} else {
 					alert("There's some problem . Please try it in seconds.");

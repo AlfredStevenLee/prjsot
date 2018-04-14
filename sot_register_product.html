@@ -103,18 +103,6 @@
 		function submit_product() {
 			var addr = "/action_register_product";
 
-			/*
-			$.post(addr,
-			new FormData($('#product_regist_form')),
-			function(data, status){
-				if(status == "success"){
-					console.log(">>> success post");
-					$("#regist_form").html("Product Regist OK! <br> Thank you for product registration.");
-				} else {
-					alert("There's some problem . Please try it in seconds.");
-				}
-			});   */
-
 			$.ajax({
 				url:addr,
 				type:'POST',
@@ -123,6 +111,9 @@
 				contentType:false,
 				processData:false,
 				success:function(data) {
+					if(checkRestData(data)) {
+						return false;
+					}
 					$("#regist_form").html("Product Regist OK! <br> Thank you for product registration.");
 				}
 			});

@@ -135,14 +135,15 @@ exports.get_bizinfo = function(req, res, callback) {
 
 
 
-exports.check_member_email = function(req, res) {
+exports.check_member_email = function(req, res, next) {
 
   //getConnection
   dbpool.getConnection(function(err, connection){
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -157,7 +158,8 @@ exports.check_member_email = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : check member email");
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       if (rows.length == 0) {
@@ -172,7 +174,7 @@ exports.check_member_email = function(req, res) {
   })
 };
 
-exports.config_member = function(req, res) {
+exports.config_member = function(req, res, next) {
 
   var param = req.body;
   var email = param.member_email;
@@ -184,7 +186,8 @@ exports.config_member = function(req, res) {
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -198,7 +201,8 @@ exports.config_member = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : check member email");
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       if (rows.length == 0) {
@@ -213,7 +217,8 @@ exports.config_member = function(req, res) {
           {
             connection.release();
             console.log(">> error from sql : check member email");
-            throw err;
+            next(err_sql);
+            return false;
           }
           req.session.member_name = name;
           res.send("UPDATE_OK");
@@ -227,14 +232,15 @@ exports.config_member = function(req, res) {
 };
 
 
-exports.register_member = function(req, res) {
+exports.register_member = function(req, res, next) {
 
   //getConnection
   dbpool.getConnection(function(err, connection){
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -249,7 +255,8 @@ exports.register_member = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql");
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       //Send verification email
@@ -265,7 +272,9 @@ exports.register_member = function(req, res) {
         if (err) {
           connection.release();
           console.log(">>error from register member / send verification email : "+err);
-          res.send("RESIGT_FAIL");
+          //res.send("RESIGT_FAIL");
+          next(err);
+          return false;
         } else {
           //register verification information into DB
           sql = "update member set verify_id = ? where email = ? ";
@@ -275,7 +284,8 @@ exports.register_member = function(req, res) {
             {
               connection.release();
               console.log(">> error from sql");
-              throw err_sql;
+              next(err_sql);
+              return false;
             } else {
               //console.log(">>sending & updating verification OK! : "+data);
 
@@ -294,7 +304,7 @@ exports.register_member = function(req, res) {
 };
 
 
-exports.goodbye_member = function(req, res) {
+exports.goodbye_member = function(req, res, next) {
   var member_id = req.session.member_id;
   var member_email = req.session.member_email;
   var member_password = common_util.getHash(req.body.member_password);
@@ -304,7 +314,8 @@ exports.goodbye_member = function(req, res) {
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
     /*
     1.패스워드가 맞는지 확인 : select id from member where id=? and password=?
@@ -333,7 +344,8 @@ exports.goodbye_member = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : goodbye1");
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       if(rows.length == 0) {
@@ -348,7 +360,8 @@ exports.goodbye_member = function(req, res) {
           {
             connection.release();
             console.log(">> error from sql : goodbye2");
-            throw err_sql;
+            next(err_sql);
+            return false;
           }
 
           if(rows[0].c_cnt > 0) {
@@ -363,7 +376,8 @@ exports.goodbye_member = function(req, res) {
               {
                 connection.release();
                 console.log(">> error from sql : goodbye3");
-                throw err_sql;
+                next(err_sql);
+                return false;
               }
 
               //SQL4-----------------------------
@@ -373,7 +387,8 @@ exports.goodbye_member = function(req, res) {
                 {
                   connection.release();
                   console.log(">> error from sql : goodbye4");
-                  throw err_sql;
+                  next(err_sql);
+                  return false;
                 }
 
                 //SQL5-----------------------------
@@ -383,7 +398,8 @@ exports.goodbye_member = function(req, res) {
                   {
                     connection.release();
                     console.log(">> error from sql : goodbye5");
-                    throw err_sql;
+                    next(err_sql);
+                    return false;
                   }
 
                   //SQL6-----------------------------
@@ -393,7 +409,8 @@ exports.goodbye_member = function(req, res) {
                     {
                       connection.release();
                       console.log(">> error from sql : goodbye6");
-                      throw err_sql;
+                      next(err_sql);
+                      return false;
                     }
 
                     connection.release();
@@ -406,7 +423,8 @@ exports.goodbye_member = function(req, res) {
                       session.destroy(function(err){
                         if(err) {
                           consol.log(err);
-                          throw err;
+                          next(err);
+                          return false;
                         } else {
 
                           var subject = "SOT 회원탈퇴가 정상적으로 완료되었습니다";
@@ -418,6 +436,8 @@ exports.goodbye_member = function(req, res) {
                           common_util.sendmailByAdmin(req, res, member_email, subject, body, function(err, data){
                             if (err) {
                               console.log(">>error from goodbye member / send verification email : "+err);
+                              next(err);
+                              return false;
                             }
 
                             //맴버탈퇴 마지막 성공!!!
@@ -449,14 +469,15 @@ exports.goodbye_member = function(req, res) {
 };
 
 
-exports.register_bizinfo = function(req, res) {
+exports.register_bizinfo = function(req, res, next) {
 
   //getConnection
   dbpool.getConnection(function(err, connection){
     if (err)
     {
       connection.release();
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -471,7 +492,8 @@ exports.register_bizinfo = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql");
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       //Get biz_id
@@ -482,7 +504,8 @@ exports.register_bizinfo = function(req, res) {
         {
           connection.release();
           console.log(">> error from sql");
-          throw err_sql;
+          next(err_sql);
+          return false;
         }
 
         var session = req.session;
@@ -500,7 +523,7 @@ exports.register_bizinfo = function(req, res) {
 };
 
 
-exports.config_bizinfo = function(req, res) {
+exports.config_bizinfo = function(req, res, next) {
 
   var param = req.body;
   var email = param.member_email;
@@ -512,8 +535,8 @@ exports.config_bizinfo = function(req, res) {
     if (err)
     {
       connection.release();
-      callback(null, err);
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -527,7 +550,8 @@ exports.config_bizinfo = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : config_bizinfo #1 : "+err_sql);
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       if (rows.length == 0) {
@@ -559,7 +583,8 @@ exports.config_bizinfo = function(req, res) {
           {
             connection.release();
             console.log(">> error from sql : config_bizinfo #2 : "+err_sql);
-            throw err_sql;
+            next(err_sql);
+            return false;
           }
           res.send("UPDATE_OK");
 
@@ -572,15 +597,15 @@ exports.config_bizinfo = function(req, res) {
 };
 
 
-exports.login_member = function(req, res) {
+exports.login_member = function(req, res, next) {
 
   //getConnection
   dbpool.getConnection(function(err, connection){
     if (err)
     {
       connection.release();
-      callback(null, err);
-      throw err;
+      next(err);
+      return false;
     }
 
     //Make Query
@@ -597,7 +622,8 @@ exports.login_member = function(req, res) {
       {
         connection.release();
         console.log(">> error from sql : member login");
-        throw err_sql;
+        next(err_sql);
+        return false;
       }
 
       //Send result & Redirect to view
@@ -677,12 +703,13 @@ exports.get_biz_wallet = function(req, res, callback) {
   });
 };
 
-exports.logout_member = function(req, res) {
+exports.logout_member = function(req, res, next) {
   var session = req.session;
   if (session.login) {
     session.destroy(function(err){
       if(err) {
-        consol.log(err);
+        next(err);
+        return false;
       } else{
         res.send("LOGOUT_SUCCESS");
       }

@@ -4,6 +4,15 @@ var dbpool = require("./dbcon").pool;
 //메인 컨트롤러 파일
 //아래와 같이 export를 통해 하나씩 메소드를 지정하고 그 내부에서 렌더링 할 파일로 redirection하면서 결과값을 함게 보내 줌
 
+exports.errorHandler = function(req, res, err) {
+  console.log("\n\n\n#####--- Error occurred from [ "+req.path+" ] ---#####\n");
+  console.log("## DATE TIME : "+new Date());
+  console.log("## ");
+  console.log("## ERROR : "+err);
+  console.log("## ");
+  console.log("\n###################################################\n\n\n");
+  res.render('../sot_under_mgmt.html', {req : req, res : res});
+};
 
 
 /**
@@ -35,9 +44,9 @@ exports.getCurrencyInfo = function(currency) {
 
           if (err)
           {
-            console.log(">> can't get sql connection!");
+            console.log(">>>>>>>>>>>> ERROR from getCurrency Info : can't get sql connection! : "+err);
             connection.release();
-            throw err;
+            return false;
           }
 
           //Make Query
@@ -49,8 +58,8 @@ exports.getCurrencyInfo = function(currency) {
             if (err_sql)
             {
               connection.release();
-              console.log(">> error from sql");
-              throw err_sql;
+              console.log(">>>>>>>>>>>> ERROR from getCurrency Info : SQL ERROR : "+err_sql);
+              return false;
             }
 
             //Release connection
@@ -60,7 +69,7 @@ exports.getCurrencyInfo = function(currency) {
       }
     });
   });
-}
+};
 
 
 
@@ -154,7 +163,8 @@ exports.prod_category = function(req, res, default_val, callback) {
       {
         connection.release();
         console.log(">> error from sql");
-        throw err_sql;
+        callback(err_sql, null);
+        return false;
       }
 
       //Send result & Redirect to view
@@ -211,7 +221,8 @@ exports.get_currency = function(req, res, callback) {
       {
         connection.release();
         console.log(">> error from sql");
-        throw err_sql;
+        callback(err_sql, null);
+        return false;
       }
 
       //Send result & Redirect to view

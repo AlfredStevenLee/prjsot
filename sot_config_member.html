@@ -137,6 +137,9 @@
 			},
 			function(data, status){
 				if(status == "success"){
+					if(checkRestData(data)) {
+						return false;
+					}
 					if (data == "UPDATE_OK") {
 						$("#update_msg").html("Account updated successfully.");
 						$("#update_msg").css("color", "blue");
@@ -172,6 +175,10 @@
 			},
 			function(data, status){
 				if(status == "success"){
+					if(checkRestData(data)) {
+						return false;
+					}
+
 					if (data == "UPDATE_OK") {
 						$("#biz_update_msg").html("Account updated successfully.");
 						$("#biz_update_msg").css("color", "blue");

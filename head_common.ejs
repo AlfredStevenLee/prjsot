@@ -24,7 +24,14 @@ var contractAddress = '0x96973bb06df09f065f343237d54eb7aab3aa112a';
 
 var abi =   [ { "constant": false, "inputs": [ { "name": "contract_no", "type": "uint32" }, { "name": "prod_id", "type": "uint32" }, { "name": "seller_account", "type": "address" }, { "name": "prod_price_sot", "type": "uint32" } ], "name": "addProductContract", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "val", "type": "uint256" } ], "name": "approve", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [], "name": "kill", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "from", "type": "address" }, { "name": "to", "type": "address" }, { "name": "val", "type": "uint256" } ], "name": "sendToken", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "to", "type": "address" }, { "name": "val", "type": "uint256" } ], "name": "sendTokenDirect", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "contract_no", "type": "uint32" } ], "name": "setApproveByBuyer", "outputs": [ { "name": "", "type": "bool" }, { "name": "", "type": "bytes10" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [ { "name": "contract_no", "type": "uint32" } ], "name": "setCancelContract", "outputs": [ { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "constant": true, "inputs": [ { "name": "cust", "type": "address" } ], "name": "balanceSot", "outputs": [ { "name": "val", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [ { "name": "contract_no", "type": "uint32" } ], "name": "getProductContract", "outputs": [ { "name": "", "type": "uint32" }, { "name": "", "type": "address" }, { "name": "", "type": "address" }, { "name": "", "type": "uint256" }, { "name": "", "type": "bytes5" }, { "name": "", "type": "bool" }, { "name": "", "type": "bool" } ], "payable": false, "stateMutability": "view", "type": "function" } ];
 
-
+function checkRestData(data) {
+  if(data == "SERVER_EXCEPTION") {
+    alert("서버 과부하로 일시 점검중입니다. 잠시후 다시 시도 부탁드립니다.");
+    return true;
+  } else {
+    return false;
+  }
+}
 
 function submit_logout() {
   var addr = "/action_logout_member";
@@ -61,14 +68,17 @@ function checkBrowser() {
 }
 
 
-function checkWeb3(callbackFunc, param) {
+function checkWeb3(callbackFunc, param, web3_msg_box) {
 
 	//web3 브라우저 여부 체크
 	if (typeof web3 !== 'undefined') {
 		// Use Mist/MetaMask's provider
 		window.web3 = new Web3(web3.currentProvider);
 	} else {
-		alert('No web3? You should consider trying MetaMask!');
+    if(web3_msg_box != null) {
+      $("#"+web3_msg_box).html("Metamask, Cipher등 이더리움 지갑을 먼저 설치해 주세요.");
+    }
+		//alert('No web3? You should consider trying MetaMask!');
 		// fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
 		window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 		return false;
@@ -77,54 +87,61 @@ function checkWeb3(callbackFunc, param) {
 	//metamsk 로그인 여부 체크
 	var myAccount = web3.eth.accounts[0];
 	if (typeof myAccount == 'undefined') {
-		alert('Metamask, Cipher등 이더리움 지갑을 열고 먼저 로그인해 주세요!');
+    if(web3_msg_box != null) {
+      $("#"+web3_msg_box).html("Metamask, Cipher등 이더리움 지갑을 열고 먼저 로그인해 주세요!");
+    }
 		return false;
 	}
 
-	//metamask network 체크. Dev mode require ropsten. change this to case 1 for commercial mode
-	web3.version.getNetwork((err, netId) => {
-		var nwstat = false;
+  var netId = web3.version.network;
+  var nwstat = false;
 
-	  switch (netId) {
-	    case "1":
-	      //	alert('This is mainnet')
-	      break
-	    case "2":
-	      //alert('This is the deprecated Morden test network.')
-	      break
-	    case "3":
-	      //alert('This is the ropsten test network.')
-				nwstat = true;
-	      break
-	    case "4":
-	      //alert('This is the Rinkeby test network.')
-	      break
-	    case "42":
-	      //alert('This is the Kovan test network.')
-	      break
-	    default:
-	      //alert('This is an unknown network.')
-	  }
+  switch (netId) {
+    case "1":
+      //	alert('This is mainnet')
+      break
+    case "2":
+      //alert('This is the deprecated Morden test network.')
+      break
+    case "3":
+      //alert('This is the ropsten test network.')
+      nwstat = true;
+      break
+    case "4":
+      //alert('This is the Rinkeby test network.')
+      break
+    case "42":
+      //alert('This is the Kovan test network.')
+      break
+    default:
+      //alert('This is an unknown network.')
+  }
 
-		if(!nwstat) {
-			alert("Please use main network!");
-			return false;
-		} else {
-      if (callbackFunc != null) {
-        if (typeof callbackFunc == "function") {
-          if (param == null) {
-            callbackFunc();
-            return true;
-          } else {
-            callbackFunc(param);
-            return true;
-          }
+  if(!nwstat) {
+    if(web3_msg_box != null) {
+      $("#"+web3_msg_box).html("서비스 이용을 위해서 이더리움 MainNet을 선택해 주세요.");
+    }
+    return false;
+  } else {
+    if(web3_msg_box != null) {
+      $("#"+web3_msg_box).html("");
+    }
+
+    if (callbackFunc != null) {
+      if (typeof callbackFunc == "function") {
+        if (param == null) {
+          callbackFunc();
+          return true;
+        } else {
+          callbackFunc(param);
+          return true;
         }
-      } else {
-        return true;
       }
-		}
-	});
+    } else {
+      return true;
+    }
+  }
+
 }
 
 function getCustBalance(containerID) {

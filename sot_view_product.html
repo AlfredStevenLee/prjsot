@@ -36,6 +36,7 @@
 										<article>
 											<!--span class="icon fa-diamond"></span-->
 											<div class="content">
+
 												<div id = "detail_form">
 
 													<form id="product_detail_form" method="post">
@@ -71,6 +72,7 @@
 														Seller Name : <span><%- prod_detail[0].seller_name %></span> </br>
 														Seller Email : <span><%- prod_detail[0].seller_email %></span> </br></br>
 
+														<div id="msg_box" style="color:red;margin-bottom:10px"></div>
 														<input type="button" id="product_buy" value="Buy this" onclick="<% if (req.session.login) { %> buy_product(<%-prod_detail[0].id%>) <% } else { %> doLoginAlarm() <% } %>">
 
 														<% if(prod_detail[0].fav == null) { %>
@@ -116,7 +118,7 @@
 		}
 
 		function buy_product(buy_prod_id) {
-			checkWeb3(doBuyProduct, buy_prod_id);
+			checkWeb3(doBuyProduct, buy_prod_id, "msg_box");
 		}
 
 		function add_product_fav(prod_id){
@@ -132,6 +134,11 @@
 			},
 			function(data, status){
 				if(status == "success"){
+
+					if(checkRestData(data)) {
+						return false;
+					}
+
 					if (data == "NO_LOGIN") {
 						alert("즐겨찾기에 추가하려면 로그인을 먼저 해주세요!");
 					} else {
@@ -165,6 +172,9 @@
 			},
 			function(prod_contract_no, status){
 				if(status == "success"){
+					if(checkRestData(prod_contract_no)) {
+						return false;
+					}
 					$("#detail_form").html("<span style='color:red'>Product saved in Database</span>");
 					//alert("prod_contract_no : "+prod_contract_no)
 					doBuyProductBlockChain(prod_contract_no);

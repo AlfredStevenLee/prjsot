@@ -31,10 +31,10 @@
 									<header class="major">
 										<h2>Contract history</h2>
 									</header>
+									<div id="msg_box" style="color:red;margin-bottom:10px"></div>
 									<div class="features">
 
 											<!--span class="icon fa-diamond"></span-->
-
 													<% for(var i=0; i < contract_list.length; i++ ) { %>
 														<article class="article_box">
 															<a href="javascript:view_prod_detail('<%- contract_list[i].prod_id %>')" class="image">
@@ -83,7 +83,7 @@
 
 		// confirm contract ---------------------------------------------------------
 		function doConfirmContract(id) {
-			checkWeb3(submit_doConfirmContract, id);
+			checkWeb3(submit_doConfirmContract, id, "msg_box");
 		}
 
 		function submit_doConfirmContract(id) {
@@ -96,6 +96,9 @@
 			},
 			function(prod_contract_no, status){
 				if(status == "success"){
+					if(checkRestData(prod_contract_no)) {
+						return false;
+					}
 					//$("#detail_form").html("<span style='color:red'>Product saved in Database</span>");
 					//alert("prod_contract_no : "+prod_contract_no)
 					doConfirmContractBlockChain(id);
@@ -133,7 +136,7 @@
 
 		// cancel contract ---------------------------------------------------------
 		function doCancelContract(id) {
-			checkWeb3(submit_doCancelContract, id);
+			checkWeb3(submit_doCancelContract, id, "msg_box");
 		}
 
 		function submit_doCancelContract(id) {
@@ -146,6 +149,9 @@
 			},
 			function(prod_contract_no, status){
 				if(status == "success"){
+					if(checkRestData(prod_contract_no)) {
+						return false;
+					}
 					//$("#detail_form").html("<span style='color:red'>Product saved in Database</span>");
 					//alert("prod_contract_no : "+prod_contract_no)
 					doCancelContractBlockChain(id);

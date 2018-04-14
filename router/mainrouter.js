@@ -55,6 +55,10 @@ module.exports = function(app)
         });
       }
     ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
         res.render('../sot_config_api.html', {req : req, res : res, prod_list : results[0], biz_wallet : results[1] });
       }
     );
@@ -73,15 +77,18 @@ module.exports = function(app)
     async.series([
       function(callback){
         require("../src/ctl_product").prod_view(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       },function(callback){
         require("../src/ctl_util").get_currency(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       }
     ],function(err, results) {
-        //res.render('../sot_register_product.html', {req : req, res : res, common_util : results[0], common_util2 : results[1]});
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
         res.render('../sot_view_product.html', {req : req, res : res, prod_detail : results[0], currency : results[1] });
       }
     );
@@ -94,14 +101,18 @@ module.exports = function(app)
     async.series([
       function(callback){
         require("../src/ctl_product").my_biz_product(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       },function(callback){
         require("../src/ctl_util").get_currency(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       }
     ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
         res.render('../sot_my_product.html', {req : req, res : res, prod_list : results[0], currency : results[1] });
       }
     );
@@ -115,14 +126,20 @@ module.exports = function(app)
     async.series([
       function(callback){
         require("../src/ctl_product").prod_list(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       },function(callback){
         require("../src/ctl_util").get_currency(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       }
     ],function(err, results) {
+
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
+
         res.render('../sot_main.html', {req : req, res : res, prod_list : results[0], currency : results[1] });
       }
     );
@@ -136,14 +153,18 @@ module.exports = function(app)
     async.series([
       function(callback){
         require("../src/ctl_product").prod_list(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       },function(callback){
         require("../src/ctl_util").get_currency(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       }
     ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
         res.render('../sot_product_list.html', {req : req, res : res, prod_list : results[0], currency : results[1] });
       }
     );
@@ -156,10 +177,14 @@ module.exports = function(app)
     async.series([
       function(callback){
         require("../src/ctl_product").contract_list_buyer(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       }
     ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
         res.render('../sot_contract_buyer.html', {req : req, res : res, contract_list : results[0] });
       }
     );
@@ -172,14 +197,18 @@ module.exports = function(app)
     async.series([
       function(callback){
         require("../src/ctl_product").get_favorite_list(req, res, function(err, data) {
-          callback(null, data);
+          callback(err, data);
         });
       },function(callback){
         require("../src/ctl_util").get_currency(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       }
     ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
         res.render('../sot_favorite_product.html', {req : req, res : res, favorite : results[0],  currency : results[1] });
       }
     );
@@ -192,18 +221,22 @@ module.exports = function(app)
     async.series([
       function(callback){
         require("../src/ctl_product").get_prod_full(req, res, function(err, data) {
-          callback(null, data);
+          callback(err, data);
         });
       },function(callback){
         require("../src/ctl_util").prod_category(req, res, true, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       },function(callback){
         require("../src/ctl_util").get_currency(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       }
     ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
         res.render('../sot_modify_product.html', {req : req, res : res, prod : results[0], prod_category : results[1], currency : results[2] });
       }
     );
@@ -216,10 +249,14 @@ module.exports = function(app)
     async.series([
       function(callback){
         require("../src/ctl_member").get_bizinfo(req, res, function(err, data) {
-          callback(null, data);
+          callback(err, data);
         });
       }
     ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
         res.render('../sot_config_member.html', {req : req, res : res, bizinfo : results[0] });
       }
     );
@@ -232,15 +269,23 @@ module.exports = function(app)
     async.series([
       function(callback){
         require("../src/ctl_member").verify_member(req, res, function(err, data) {
-          callback(null, data);
+          callback(err, data);
         });
       }
     ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
         res.render('../sot_verify_member.html', {req : req, res : res, verify_result : results[0], emailaddr : req.query.emailaddr });
       }
     );
   });
 
+
+  app.get('/sot_under_mgmt', function(req, res){
+    res.render('../sot_under_mgmt.html', {req : req, res : res});
+  });
 
   app.get('/editor', function(req, res){
     res.render('../editor.html', {req : req, res : res});
@@ -262,6 +307,10 @@ module.exports = function(app)
 
   app.get('/goodbye_member', function(req, res){
     res.render('../sot_goodbye_member.html', {req : req, res : res});
+  });
+
+  app.get('/exchange_sot', function(req, res){
+    res.render('../sot_exchange.html', {req : req, res : res});
   });
 
   app.post('/action_logout_member', require("../src/ctl_member").logout_member);
@@ -297,15 +346,18 @@ module.exports = function(app)
     async.series([
       function(callback){
         require("../src/ctl_util").prod_category(req, res, true, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       },function(callback){
         require("../src/ctl_util").get_currency(req, res, function(err, data){
-          callback(null, data);
+          callback(err, data);
         });
       }
     ],function(err, results) {
-        //res.render('../sot_register_product.html', {req : req, res : res, common_util : results[0], common_util2 : results[1]});
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
         res.render('../sot_register_product.html', {req : req, res : res, prod_category : results[0], currency : results[1] });
       }
     );

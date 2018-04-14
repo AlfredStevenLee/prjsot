@@ -141,7 +141,11 @@
 				cache:false,
 				contentType:false,
 				processData:false,
-				success:function(data) {
+				success:function(data)
+					if(checkRestData(data)) {
+						return false;
+					}
+					
 					var p_id = $("#prod_id").val();
 					$("#regist_form").html("Product updated successfully!");
 					setTimeout("window.location.replace('http://127.0.0.1:8080/modify_product?prod_id="+p_id+"')", 2000);

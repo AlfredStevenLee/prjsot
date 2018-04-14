@@ -41,3 +41,15 @@ var server = app.listen(8080, function(){
 
 app.use(express.static('../public'));
 app.use('/uploads',express.static('../uploads'));
+app.use(error_handler);
+function error_handler(err, req, res, next) {
+  console.log("\n\n\n#####--- Error occurred from [ "+req.path+" ] SVR---#####\n");
+  console.log("## DATE TIME : "+new Date());
+  console.log("## ");
+  console.log("## ERROR : "+err);
+  console.log("## ");
+  console.log("\n###################################################\n\n\n");
+
+  res.send("SERVER_EXCEPTION");
+  //next(err);
+}

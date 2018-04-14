@@ -99,6 +99,10 @@
 			},
 			function(data, status){
 				if(status == "success"){
+					if(checkRestData(data)) {
+						return false;
+					}
+
 					$("#regist_form").html("Thank you for registration. You can sell your precious products from now.<br> This window will be reloaded to main page for biz support menu in a second!");
 					//alert("Thank you for registration. You can sell your precious products from now.\n This window will be reloaded to main page for biz support menu in a second! ");
 					setTimeout("window.location.replace('/sotmain')",4000);

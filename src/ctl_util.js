@@ -32,6 +32,11 @@ exports.contract_list_html_maker = function(contract_list) {
     result +="    <div>"+contract_list[i].prod_name+"</div>";
     result +="    <div>"+contract_list[i].price_sot.toFixed(2)+" SOT ("+contract_list[i].price_krw+" KRW) </div>";
     result +="    <div>결제지갑 : "+contract_list[i].buyer_account_no+" </div>";
+
+    if(contract_list[i].logistics_yn == "Y") {
+      result +="    <div class='logis_text_box'><div class='logis_text_content'>택배주소 : ("+contract_list[i].logis_zip+") "+contract_list[i].logis_addr1+" "+contract_list[i].logis_addr2+"</div></div>";
+    }
+
     result +="  </div>";
     result +="</article>";
   }

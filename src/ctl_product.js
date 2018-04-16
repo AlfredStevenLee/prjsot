@@ -412,7 +412,7 @@ exports.contract_list_buyer = function(req, res, callback) {
     }
 
     //Make Query
-    var sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val from contract a, product b, code c where buyer_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
+    var sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val, b.logistics_yn, a.logis_zip, a.logis_addr1, a.logis_addr2 from contract a, product b, code c where buyer_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
     var buyer_id = req.session.member_id;
 
     //Execute SQL
@@ -496,7 +496,7 @@ exports.prod_view = function(req, res, callback) {
 
     //Make Query
     var sql = "select a.id, a.cat_id, b.cd_val 'cat_name', a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, ";
-    sql += "a.description, a.logistics_yn, a.active_yn, a.register_id 'seller_id', c.email 'seller_email', c.name 'seller_name', d.payment_wallet_addr, count(e.prod_id) as sellcount, ";
+    sql += "a.description, a.logistics_yn, a.active_yn, a.register_id 'seller_id', c.email 'seller_email', c.name 'seller_name', d.payment_wallet_addr, d.contact_phone, d.contact_address, d.provider_name, count(e.prod_id) as sellcount, ";
     sql += "(select 'Y' from favorite g where g.member_id = ? and g.prod_id = a.id) as fav ";
     sql += "from product a left outer join contract e on e.prod_id = a.id, code b, member c, provider d  ";
     sql += "where a.id = ? and a.cat_id = b.cd and b.cd_group = 'PROD_CAT' and c.id = a.register_id and d.register_id = a.register_id ";
@@ -530,6 +530,9 @@ exports.buy_product = function(req, res, next) {
   var buyer_account = param.buyer_account;
   var contract_address = param.contract_address;
   var buyer_id = req.session.member_id;
+  var logis_zip = common_util.checkNullString(param.logis_zip);
+  var logis_addr1 = common_util.checkNullString(param.logis_addr1);
+  var logis_addr2 = common_util.checkNullString(param.logis_addr2);
 
   //console.log(">> prod id : "+JSON.stringify(param)+" / "+param.prod_id);
   //console.log(">> buyer id : "+buyer_id);
@@ -545,14 +548,14 @@ exports.buy_product = function(req, res, next) {
 
     //Make Query
     var sql = "insert into contract ";
-    sql += "select null, a.id, a.register_id, b.id, ?, c.payment_wallet_addr, ?, a.price_krw, a.price_sot, a.price_eth, 'REG', 0, null, now() ";
+    sql += "select null, a.id, a.register_id, b.id, ?, c.payment_wallet_addr, ?, a.price_krw, a.price_sot, a.price_eth, 'REG', ?, ?, ?, 0, null, now() ";
     sql += " from product a, member b, provider c ";
     sql += " where a.id = ? and b.id = ? and c.register_id = a.register_id";
     //var param = req.body;
     //console.log(">> start register");
 
     //Execute SQL : save contract info to db
-    connection.query(sql, [contract_address, buyer_account, prod_id, buyer_id] , function(err_sql, rows)
+    connection.query(sql, [contract_address, buyer_account, logis_zip, logis_addr1, logis_addr2, prod_id, buyer_id] , function(err_sql, rows)
     {
       if (err_sql)
       {

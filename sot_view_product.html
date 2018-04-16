@@ -69,17 +69,38 @@
 														상품설명 : <br>
 														<div id="prod_preview" class="box"><%if(prod_detail[0].description == "null"){%><%}else{%> <%-prod_detail[0].description%> <%}%></div>
 
-														Seller Name : <span><%- prod_detail[0].seller_name %></span> </br>
-														Seller Email : <span><%- prod_detail[0].seller_email %></span> </br></br>
-
 														<div id="msg_box" style="color:red;margin-bottom:10px"></div>
-														<input type="button" id="product_buy" value="Buy this" onclick="<% if (req.session.login) { %> buy_product(<%-prod_detail[0].id%>) <% } else { %> doLoginAlarm() <% } %>">
+														<input type="button" id="product_buy" value="구매신청" onclick="<% if (req.session.login) { %> req_product_buy() <% } else { %> doLoginAlarm() <% } %>">
 
 														<% if(prod_detail[0].fav == null) { %>
 															<span id="prod_add_fav" style="cursor:pointer" onclick="javascript:add_product_fav(<%-prod_detail[0].id%>);" value="N">즐겨찾기 추가하기</span>
 														<% } else { %>
 															<span id="prod_add_fav" style="cursor:pointer" onclick="javascript:add_product_fav(<%-prod_detail[0].id%>);" value="Y">즐겨찾기 삭제하기</span>
 														<% } %>
+
+														<div id="buy_prod_box" class="form_input_container" style="display:none">
+															<div id="logis_seller_box" style="border-bottom:0.5px solid #cccccc;margin-bottom:10px;padding-bottom:5px">
+																<div style="margin-bottom:12px"><li>판매자 정보는 아래와 같습니다</li></div>
+																<div style="padding-left:20px;">
+																	<div>판매자 : <%- prod_detail[0].provider_name %> ( <%- prod_detail[0].seller_name %> )</div>
+																	<div>연락처 : <%- prod_detail[0].contact_phone %> / <%- prod_detail[0].seller_email %></div>
+																	<div>주소 : <%- prod_detail[0].contact_address %></div>
+																</div>
+															</div>
+															<div id="logis_input_box" style="display:none">
+															  <div style="margin-bottom:12px"><li>택배 받을 주소를 입력하여 주세요</li></div>
+																<div style="padding-left:20px;">
+																	<div><a href="javascript:searchZipcode()" id="zip_open" style="margin-bottom:5px;">[주소검색]</a></div>
+																	우편번호 <input type="text" name="logis_zip" id="logis_zip" style="width:15%;display:inline-block" readonly>
+																	<input type="text" name="logis_addr1" id="logis_addr1" style="width:64%;display:inline-block;margin-bottom:8px" readonly><br>
+																	상세주소 <input type="text" name="logis_addr2" id="logis_addr2" style="width:80%;display:inline-block">
+															  </div>
+															</div>
+															<input type="button" value="상품을 구매합니다" style="display:block;margin-top:5px;margin-bottom:15px;width:100%" onclick="buy_product(<%-prod_detail[0].id%>)">
+															<div>※ 상품구매시 계약만 체결되며 "구매확정"전 까지는 결제처리가 되지 않습니다.<br>
+																   ※ 서비스를 받으신 후 "마이페이지 > 구매계약리스트"에서 최종 확정을 해 주십시요.
+															</div>
+													  </div>
 
 													</form>
 
@@ -111,7 +132,17 @@
 
 
   <!--자바스크립트 기입부-->
+	<script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
 	<script>
+	  var logis_yn = "<%-prod_detail[0].logistics_yn%>";
+
+		function req_product_buy() {
+			$("#buy_prod_box").fadeIn("fast");
+
+			<% if(prod_detail[0].logistics_yn == "Y") { %>
+		  $("#logis_input_box").css("display","block");
+			<% } %>
+		}
 
 		function doLoginAlarm() {
 			alert("상품을 구매하실려면 먼저 로그인해 주세요!");
@@ -157,6 +188,16 @@
 		}
 
 		function doBuyProduct(buy_prod_id){
+			var p_logis_zip = $("#logis_zip").val();
+			var p_logis_addr1 = $("#logis_addr1").val();
+			var p_logis_addr2 = $("#logis_addr2").val();
+
+			if (logis_yn == "Y") {
+				if((p_logis_zip == "") || (p_logis_addr1 == "") || (p_logis_addr2 == "")) {
+					alert("택배 배송이 필요한 상품입니다. 택배 주소를 먼저 입력해 주십시요.");
+					return false;
+				}
+			}
 
 			$("#detail_form").html("<span style='color:red'>Now registering... wait a minute!</span>");
 
@@ -168,7 +209,10 @@
 			{
 				prod_id:buy_prod_id,
 				buyer_account:buyerAccount,
-				contract_address:contractAddress
+				contract_address:contractAddress,
+				logis_zip:p_logis_zip,
+				logis_addr1:p_logis_addr1,
+				logis_addr2:p_logis_addr2
 			},
 			function(prod_contract_no, status){
 				if(status == "success"){
@@ -225,6 +269,48 @@
 		 	});
 		}
 
+
+		function searchZipcode() {
+			new daum.Postcode({
+					oncomplete: function(data) {
+							// 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+							// 각 주소의 노출 규칙에 따라 주소를 조합한다.
+							// 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+							var fullAddr = ''; // 최종 주소 변수
+							var extraAddr = ''; // 조합형 주소 변수
+
+							// 사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+							if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+									fullAddr = data.roadAddress;
+
+							} else { // 사용자가 지번 주소를 선택했을 경우(J)
+									fullAddr = data.jibunAddress;
+							}
+
+							// 사용자가 선택한 주소가 도로명 타입일때 조합한다.
+							if(data.userSelectedType === 'R'){
+									//법정동명이 있을 경우 추가한다.
+									if(data.bname !== ''){
+											extraAddr += data.bname;
+									}
+									// 건물명이 있을 경우 추가한다.
+									if(data.buildingName !== ''){
+											extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+									}
+									// 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
+									fullAddr += (extraAddr !== '' ? ' ('+ extraAddr +')' : '');
+							}
+
+							// 우편번호와 주소 정보를 해당 필드에 넣는다.
+							$("#logis_zip").val(data.zonecode); //5자리 새우편번호 사용
+							$("#logis_addr1").val(fullAddr);
+
+							// 커서를 상세주소 필드로 이동한다.
+							$("#logis_addr2").focus();
+					}
+			}).open();
+    }
 
 	</script>
 

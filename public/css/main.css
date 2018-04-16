@@ -4122,13 +4122,13 @@
 .article_box {
 	background:#ffffff;
 	border:1px solid #cccccc;
-	padding:3px;
+	padding:8px;
 	box-shadow:3px 3px 10px #cccccc;
 }
 .article_box_main {
 	background:#ffffff;
 	border:1px solid #cccccc;
-	padding:3px;
+	padding:8px;
 	box-shadow:3px 3px 10px #cccccc;
 	height: 467px;
 }
@@ -4174,4 +4174,28 @@
 	.article_box_main {
 		height:auto;
 	}
+}
+
+
+.form_input_container {
+	background:#ffffff;
+	border:1px solid #cccccc;
+	padding:8px;
+	margin-top:20px;
+	box-shadow:3px 3px 10px #cccccc;
+}
+
+.logis_text_box {
+	width: 300px;
+	height:25px;
+	overflow:hidden;
+}
+
+.logis_text_content {
+	width: 100%;
+	height:50px;
+	white-space:nowrap;
+	overflow-x: scroll;
+  overflow-y: hidden;
+	-webkit-overflow-scrolling: touch;
 }

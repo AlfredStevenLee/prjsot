@@ -156,4 +156,39 @@ function getCustBalance(containerID) {
 }
 
 
+function pagingController(_parent, _post) {
+  var pageNum = 1;
+  var processing = false;
+  _win = $(window);
+
+  _win.scroll(function() {
+    //$("#sizetest").html("DH : "+$(document).height()+" / WH : "+_win.height()+"<br>ST: "+Math.round(_win.scrollTop())+" = D-W : "+ ($(document).height() - _win.height()) );
+    if ( ($(document).height() - _win.height() <= Math.round(_win.scrollTop()+250)) && (!processing)) {
+      pageNum++;
+      processing = true;
+
+      $.post(_post,
+      {
+        pageNum:pageNum
+      },
+      function(data, status){
+        if(status == "success"){
+          if(checkRestData(data)) {
+            return false;
+          }
+
+          if (data == "NO_DATA") {
+            return false;
+          }
+          _parent.append(data);
+          processing = false;
+        } else {
+          alert("There's some problem . Please try it in seconds.");
+        }
+      });
+    }
+  });
+}
+
+
 </script>

@@ -95,7 +95,6 @@ module.exports = function(app)
   });
 
   app.get('/sot_my_product', function(req, res){
-
     var async = require('async');
 
     async.series([
@@ -113,7 +112,31 @@ module.exports = function(app)
           require('../src/ctl_util').errorHandler(req, res, err);
           return false;
         }
-        res.render('../sot_my_product.html', {req : req, res : res, prod_list : results[0], currency : results[1] });
+        var result = require('../src/ctl_util').my_product_html_maker(results[0], results[1]);
+        res.render('../sot_my_product.html', {req : req, res : res, html : result });
+      }
+    );
+  });
+  app.post('/get_my_product_paging', function(req, res){
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").my_biz_product(req, res, function(err, data){
+          callback(err, data);
+        });
+      },function(callback){
+        require("../src/ctl_util").get_currency(req, res, function(err, data){
+          callback(err, data);
+        });
+      }
+    ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
+        var result = require('../src/ctl_util').my_product_html_maker(results[0], results[1]);
+        res.send(result);
       }
     );
   });
@@ -139,11 +162,41 @@ module.exports = function(app)
           require('../src/ctl_util').errorHandler(req, res, err);
           return false;
         }
+        var result = require('../src/ctl_util').product_html_maker(results[0], results[1]);
 
-        res.render('../sot_main.html', {req : req, res : res, prod_list : results[0], currency : results[1] });
+        res.render('../sot_main.html', {req : req, res : res, html:result });
+        //res.render('../sot_main.html', {req : req, res : res, prod_list : results[0], currency : results[1] });
       }
     );
   });
+
+  app.post('/get_prod_paging', function(req, res){
+
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").prod_list(req, res, function(err, data){
+          callback(err, data);
+        });
+      },function(callback){
+        require("../src/ctl_util").get_currency(req, res, function(err, data){
+          callback(err, data);
+        });
+      }
+    ],function(err, results) {
+
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
+
+        var result = require('../src/ctl_util').product_html_maker(results[0], results[1]);
+        res.send(result);
+      }
+    );
+  });
+
 
 
   app.get('/sot_product_list', function(req, res){
@@ -185,7 +238,28 @@ module.exports = function(app)
           require('../src/ctl_util').errorHandler(req, res, err);
           return false;
         }
-        res.render('../sot_contract_buyer.html', {req : req, res : res, contract_list : results[0] });
+        var result = require('../src/ctl_util').contract_list_html_maker(results[0]);
+        res.render('../sot_contract_buyer.html', {req : req, res : res, html : result });
+      }
+    );
+  });
+  app.post('/get_contract_buyer_paging', function(req, res){
+
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").contract_list_buyer(req, res, function(err, data){
+          callback(err, data);
+        });
+      }
+    ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
+        var result = require('../src/ctl_util').contract_list_html_maker(results[0]);
+        res.send(result);
       }
     );
   });

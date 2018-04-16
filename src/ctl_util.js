@@ -4,6 +4,130 @@ var dbpool = require("./dbcon").pool;
 //메인 컨트롤러 파일
 //아래와 같이 export를 통해 하나씩 메소드를 지정하고 그 내부에서 렌더링 할 파일로 redirection하면서 결과값을 함게 보내 줌
 
+
+exports.contract_list_html_maker = function(contract_list) {
+
+  var result = "";
+
+  if(contract_list.length == 0) {
+    return  "NO_DATA";
+  }
+
+  for(var i=0; i < contract_list.length; i++ ) {
+    result +="<article class=\"article_box\">";
+    result +="  <a href=\"javascript:view_prod_detail('"+contract_list[i].prod_id+"')\" class=\"image\">";
+    result +="    <div class=\"small_img_box\"><img src=\"/uploads/"+contract_list[i].img_url+"\" class=\"small_img_clip\" /></div>";
+    result +="  </a>";
+    result +="  <div class=\"content\" style=\"margin-left:10px\">";
+    result +="    <div style=\"margin-bottom:10px\">";
+    result +="      <span id=\"CNTR_STAT_"+contract_list[i].id +"\">"+ contract_list[i].contract_status_val +"</span>";
+
+    if (contract_list[i].contract_status == "REG") {
+      result +="        <span id=\"REG_"+contract_list[i].id+"\">";
+      result +="        [<a href=\"javascript:doConfirmContract("+ contract_list[i].id +")\">Confirm</a> /";
+      result +="        <a href=\"javascript:doCancelContract("+contract_list[i].id+")\">Cancel</a>]";
+      result +="        </span>";
+    }
+    result +="    </div>";
+    result +="    <div>"+contract_list[i].prod_name+"</div>";
+    result +="    <div>"+contract_list[i].price_sot.toFixed(2)+" SOT ("+contract_list[i].price_krw+" KRW) </div>";
+    result +="    <div>결제지갑 : "+contract_list[i].buyer_account_no+" </div>";
+    result +="  </div>";
+    result +="</article>";
+  }
+
+   return result;
+};
+
+
+
+exports.my_product_html_maker = function(prod_list, currency) {
+
+  var result = "";
+
+  if(prod_list.length == 0) {
+    return  "NO_DATA";
+  }
+
+  for(var i=0; i < prod_list.length; i++ ) {
+
+		result += "<article class=\"article_box\">";
+		result += "	<a href=\"javascript:view_prod_detail('"+prod_list[i].id +"')\" class=\"image\">";
+		result += "		<div class=\"small_img_box\"><img src=\"/uploads/"+prod_list[i].img_url+"\" class=\"small_img_clip\"/></div>";
+		result += "	</a>";
+		result += "	<div class=\"content\" style=\"margin-left:10px\">";
+		result += "		<div class=\"content\" style=\"margin-bottom:10px\"> "+prod_list[i].prod_name +"</div>";
+
+
+    var pre_krw = prod_list[i].price_krw;
+    var cur_krw = prod_list[i].price_sot * currency.sot_krw;
+    var gap_diff = cur_krw - pre_krw;
+    var gap_percent = (gap_diff*100/pre_krw).toFixed(1);
+    var gap_symbol = "";
+    if(gap_diff == 0) {
+      gap_symbol = "";
+    } else if(gap_diff < 0) {
+      gap_symbol = "↓";
+    } else {
+      gap_symbol = "↑";
+    }
+
+    result +="    <div>";
+    result +="      판매가격 : "+ prod_list[i].price_sot.toFixed(2) +" SOT";
+    result +="    </div>";
+    result +="    <div>";
+    result +="      시세변화 : 등록 "+ pre_krw +"원, 현재 "+ cur_krw.toFixed(0) +"원/"+gap_percent+"% "+gap_symbol;
+    result +="    </div>";
+    result +="    <div>구매 "+ prod_list[i].sellcount +" 회</div>";
+    result +="  </div>";
+    result +="</article>";
+   }
+
+   return result;
+};
+
+exports.product_html_maker = function(prod_list, currency) {
+
+  var result = "";
+
+  if(prod_list.length == 0) {
+    return  "NO_DATA";
+  }
+
+  for(var i=0; i < prod_list.length; i++ ) {
+
+    result += "<article class=\"article_box_main\">";
+    result += "  <a href=\"javascript:view_prod_detail('"+prod_list[i].id+"')\" class=\"image\">";
+    result +="     <div class=\"small_img_box_main\"><img src=\"/uploads/"+prod_list[i].img_url+"\" class=\"small_img_clip_main\" /></div>";
+    result += "  </a>";
+    result +="  <p> "+prod_list[i].prod_name+" </p>";
+
+    var pre_krw = prod_list[i].price_krw;
+    var cur_krw = prod_list[i].price_sot * currency.sot_krw;
+    var gap_diff = cur_krw - pre_krw;
+    var gap_percent = (gap_diff*100/pre_krw).toFixed(1);
+    var gap_symbol = "";
+    if(gap_diff == 0) {
+      gap_symbol = "";
+    } else if(gap_diff < 0) {
+      gap_symbol = "↓";
+    } else {
+      gap_symbol = "↑";
+    }
+
+    result +="  <span>";
+    result +="    "+prod_list[i].price_sot.toFixed(2)+" SOT (등록가 "+pre_krw+" 원, 현재 "+cur_krw.toFixed(0)+" 원 / "+gap_percent+"% "+gap_symbol+" )";
+    result +="  </span>";
+    result +="  <div>구매 "+prod_list[i].sellcount+" 회</div>";
+    result +="</article>";
+   }
+
+   return result;
+};
+
+
+
+
 exports.errorHandler = function(req, res, err) {
   console.log("\n\n\n#####--- Error occurred from [ "+req.path+" ] ---#####\n");
   console.log("## DATE TIME : "+new Date());

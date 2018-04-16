@@ -29,33 +29,13 @@
 							<!-- Section -->
 								<section>
 									<header class="major">
-										<h2>Contract history</h2>
+										<h2>계약 진행 내역</h2>
 									</header>
 									<div id="msg_box" style="color:red;margin-bottom:10px"></div>
-									<div class="features">
+									<div id="contentsBox" class="features">
 
 											<!--span class="icon fa-diamond"></span-->
-													<% for(var i=0; i < contract_list.length; i++ ) { %>
-														<article class="article_box">
-															<a href="javascript:view_prod_detail('<%- contract_list[i].prod_id %>')" class="image">
-																<div class="small_img_box"><img src="/uploads/<%-contract_list[i].img_url%>" class="small_img_clip" /></div>
-														  </a>
-															<div class="content" style="margin-left:10px">
-																<div style="margin-bottom:10px">
-																	<span id="CNTR_STAT_<%- contract_list[i].id %>"><%- contract_list[i].contract_status_val %></span>
-																	<% if (contract_list[i].contract_status == "REG") { %>
-																		<span id="REG_<%- contract_list[i].id %>">
-																		[<a href="javascript:doConfirmContract(<%- contract_list[i].id %>)">Confirm</a> /
-																		<a href="javascript:doCancelContract(<%- contract_list[i].id %>)">Cancel</a>]
-																		</span>
-																	<% } %>
-																</div>
-																<div><%- contract_list[i].prod_name %></div>
-																<div><%- contract_list[i].price_sot.toFixed(2) %> SOT (<%- contract_list[i].price_krw %> KRW) </div>
-																<div>결제지갑 : <%- contract_list[i].buyer_account_no %> </div>
-															</div>
-														</article>
-													<% } %>
+													<%-html%>
 
 									</div>
 								</section>
@@ -75,6 +55,12 @@
   <!--자바스크립트 기입부-->
 
 	<script>
+
+		$(document).ready(function(){
+
+			pagingController($("#contentsBox"), "/get_contract_buyer_paging");
+
+		});
 
 		function view_prod_detail(prod_id) {
 			//alert("선택상품코드 : "+prod_id);

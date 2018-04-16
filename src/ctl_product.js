@@ -245,6 +245,15 @@ exports.get_favorite_list = function(req, res, callback) {
 
 exports.my_biz_product = function(req, res, callback) {
 
+  //## for Paging ################################
+  var pageNum = req.body.pageNum;
+  var pageSize = 10;
+  if ((pageNum == undefined) || (pageNum < 1)) {
+    pageNum = 1;
+  }
+  var startPage = (pageNum-1)*pageSize;
+  //##############################################
+
   //getConnection
   dbpool.getConnection(function(err, connection){
 
@@ -257,10 +266,10 @@ exports.my_biz_product = function(req, res, callback) {
     }
 
     //Make Query
-    var sql = "select a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn, a.active_yn, count(b.prod_id) as sellcount from product a left outer join contract b on b.prod_id = a.id where a.register_id=? group by a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn, a.active_yn ";
+    var sql = "select a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn, a.active_yn, count(b.prod_id) as sellcount from product a left outer join contract b on b.prod_id = a.id where a.register_id=? group by a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn, a.active_yn order by a.id desc limit ?,?";
 
     //Execute SQL
-    connection.query(sql, req.session.member_id, function(err_sql, rows)
+    connection.query(sql, [req.session.member_id, startPage, pageSize], function(err_sql, rows)
     {
       //var result_str = "";
       if (err_sql)
@@ -282,6 +291,16 @@ exports.my_biz_product = function(req, res, callback) {
 
 exports.prod_list = function(req, res, callback) {
 
+  //## for Paging ################################
+  var pageNum = req.body.pageNum;
+  var pageSize = 10;
+  if ((pageNum == undefined) || (pageNum < 1)) {
+    pageNum = 1;
+  }
+  var startPage = (pageNum-1)*pageSize;
+  //##############################################
+
+
   //getConnection
   dbpool.getConnection(function(err, connection){
 
@@ -294,10 +313,15 @@ exports.prod_list = function(req, res, callback) {
     }
 
     //Make Query
-    var sql = "select a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn, count(b.prod_id) as sellcount from product a left outer join contract b on b.prod_id = a.id where a.active_yn = 'Y' group by a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn ";
+    var sql = "select a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, ";
+    sql += "          a.logistics_yn, count(b.prod_id) as sellcount ";
+    sql += "     from product a left outer join contract b on b.prod_id = a.id ";
+    sql += "    where a.active_yn = 'Y' ";
+    sql += "    group by a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn order by a.id desc ";
+    sql += "    limit ?, ?";
 
     //Execute SQL
-    connection.query(sql, function(err_sql, rows)
+    connection.query(sql,[startPage, pageSize], function(err_sql, rows)
     {
       //var result_str = "";
       if (err_sql)
@@ -367,6 +391,15 @@ exports.prod_list_api = function(req, res, callback) {
 
 exports.contract_list_buyer = function(req, res, callback) {
 
+  //## for Paging ################################
+  var pageNum = req.body.pageNum;
+  var pageSize = 10;
+  if ((pageNum == undefined) || (pageNum < 1)) {
+    pageNum = 1;
+  }
+  var startPage = (pageNum-1)*pageSize;
+  //##############################################
+
   //getConnection
   dbpool.getConnection(function(err, connection){
 
@@ -379,11 +412,11 @@ exports.contract_list_buyer = function(req, res, callback) {
     }
 
     //Make Query
-    var sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val from contract a, product b, code c where buyer_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc ";
+    var sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val from contract a, product b, code c where buyer_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
     var buyer_id = req.session.member_id;
 
     //Execute SQL
-    connection.query(sql, buyer_id, function(err_sql, rows)
+    connection.query(sql, [buyer_id, startPage, pageSize], function(err_sql, rows)
     {
       //var result_str = "";
       if (err_sql)

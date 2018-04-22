@@ -389,6 +389,45 @@ exports.prod_list_api = function(req, res, callback) {
 };
 
 
+exports.update_contract_stat = function(req, res, next) {
+  var param = req.body;
+  var contract_no = param.contract_no;
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      console.log(">> can't get sql connection!");
+      connection.release();
+      next(err);
+      return false;
+    }
+
+    //Make Query
+    var sql = "update contract set contract_status = 'REG' where id = ? ";
+
+    //Execute SQL
+    connection.query(sql, contract_no, function(err_sql, rows)
+    {
+
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : update_contract_stat");
+        next(err_sql);
+        return false;
+      }
+
+      //Release connection
+      connection.release();
+      res.send("REGIST_SUCCESS");
+
+    });
+  });
+};
+
+
 exports.contract_list_buyer = function(req, res, callback) {
 
   //## for Paging ################################
@@ -412,11 +451,58 @@ exports.contract_list_buyer = function(req, res, callback) {
     }
 
     //Make Query
-    var sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val, b.logistics_yn, a.logis_zip, a.logis_addr1, a.logis_addr2 from contract a, product b, code c where buyer_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
+    var sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val, b.logistics_yn, a.logis_zip, a.logis_addr1, a.logis_addr2, date_format(a.logdate,'%y/%m/%d %H:%i') as logged_date from contract a, product b, code c where buyer_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
     var buyer_id = req.session.member_id;
 
     //Execute SQL
     connection.query(sql, [buyer_id, startPage, pageSize], function(err_sql, rows)
+    {
+      //var result_str = "";
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql");
+        callback(err_sql, null);
+        return false;
+      }
+
+      //Release connection
+      connection.release();
+      callback(null, rows);
+
+    });
+  });
+};
+
+
+exports.contract_list_seller = function(req, res, callback) {
+
+  //## for Paging ################################
+  var pageNum = req.body.pageNum;
+  var pageSize = 10;
+  if ((pageNum == undefined) || (pageNum < 1)) {
+    pageNum = 1;
+  }
+  var startPage = (pageNum-1)*pageSize;
+  //##############################################
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      console.log(">> can't get sql connection!");
+      connection.release();
+      callback(err, null);
+      return false;
+    }
+
+    //Make Query
+    var sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val, b.logistics_yn, a.logis_zip, a.logis_addr1, a.logis_addr2, date_format(a.logdate,'%y/%m/%d %H:%i') as logged_date from contract a, product b, code c where seller_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
+    var _id = req.session.member_id;
+
+    //Execute SQL
+    connection.query(sql, [_id, startPage, pageSize], function(err_sql, rows)
     {
       //var result_str = "";
       if (err_sql)
@@ -546,9 +632,9 @@ exports.buy_product = function(req, res, next) {
       return false;
     }
 
-    //Make Query
+    //Make Query  KRW 원화는 현재 시세로 다시 계산해서 등록함
     var sql = "insert into contract ";
-    sql += "select null, a.id, a.register_id, b.id, ?, c.payment_wallet_addr, ?, a.price_krw, a.price_sot, a.price_eth, 'REG', ?, ?, ?, 0, null, now() ";
+    sql += "select null, a.id, a.register_id, b.id, ?, c.payment_wallet_addr, ?, (select e.sot_krw*a.price_sot from currency e order by id desc limit 0,1), a.price_sot, a.price_eth, 'INI', ?, ?, ?, 0, null, now() ";
     sql += " from product a, member b, provider c ";
     sql += " where a.id = ? and b.id = ? and c.register_id = a.register_id";
     //var param = req.body;

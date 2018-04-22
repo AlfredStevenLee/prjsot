@@ -4108,6 +4108,7 @@
 	width:100%;
 	position:absolute;
 	clip:rect(0px,110px,110px,0px);
+	box-shadow:0px 3px 4px #cccccc;
 }
 .small_img_box_main {
 	width:500px;
@@ -4121,9 +4122,9 @@
 }
 .article_box {
 	background:#ffffff;
-	border:1px solid #cccccc;
+	border:0.5px solid #cccccc;
 	padding:8px;
-	box-shadow:3px 3px 10px #cccccc;
+	box-shadow:2px 2px 4px #cccccc;
 }
 .article_box_main {
 	background:#ffffff;

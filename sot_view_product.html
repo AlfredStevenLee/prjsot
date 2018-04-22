@@ -219,7 +219,7 @@
 					if(checkRestData(prod_contract_no)) {
 						return false;
 					}
-					$("#detail_form").html("<span style='color:red'>Product saved in Database</span>");
+					$("#detail_form").html("<span style='color:red'>상품계약정보를 등록중입니다. 이더리움 지갑에서 submit을 클릭해 주세요.</span>");
 					//alert("prod_contract_no : "+prod_contract_no)
 					doBuyProductBlockChain(prod_contract_no);
 				} else {
@@ -254,19 +254,51 @@
 
 			productManager.addProductContract.sendTransaction(contract_no,prod_id,seller_account,price_sot,function(e,r){
 				txid = r;
-				$("#detail_form").html("<span style='color:green'>Product registration is proceeding...</span>");
+				//alert("Transaction start #1"); //Submit, Reject 버튼이 클릭되고 난 이후에 발생되는 부분
+				//alert("txid "+txid);
+				if(txid == undefined) {
+					//alert("TX rejected!");
+					$("#detail_form").html("<span style='color:green'>구매신청이 취소되었습니다. 다시 구매를 진행해 주세요.</span>");
+				} else {
+					doUpdateContractStat(contract_no);
+					$("#detail_form").html("<span style='color:green'>구매가 정상적으로 신청되었으며 블록체인에 기록중입니다.<br>이 페이지를 나가셔도 구매계약관리 또는 이더스캔에서 진행상태를 확인할 수 있습니다. (2~3분 소요)</span>");
+				}
 			});
+
+			//alert("start #2");
 
 			var filter = web3.eth.filter('latest');
 		  filter.watch(function(e, r) {
 		    //getValue();
+				//alert("after commit start #3");
 		    web3.eth.getTransaction(txid, function(e,r){
 		      if (r != null && r.blockNumber > 0) {
-		        $("#detail_form").html("<span style='color:blue'>Product registration completed! Thank you.</span>");
+		        $("#detail_form").html("<span style='color:blue'>구매신청이 정상적으로 완료되었습니다. 감사합니다.</span>");
 		        filter.stopWatching();
 		      }
 		   	});
 		 	});
+		}
+
+		function doUpdateContractStat(p_contract_no) {
+			var addr = "/action_update_contract_stat";
+
+			$.post(addr,
+			{
+				contract_no:p_contract_no
+			},
+			function(data, status){
+				if(status == "success"){
+					if(checkRestData(prod_contract_no)) {
+						return false;
+					}
+					//$("#detail_form").html("<span style='color:red'>Product saved in Database</span>");
+					//alert("prod_contract_no : "+prod_contract_no)
+					//doBuyProductBlockChain(prod_contract_no);
+				} else {
+					alert("There's some problem . Please try it in seconds.");
+				}
+			});
 		}
 
 

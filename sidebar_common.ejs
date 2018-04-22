@@ -35,7 +35,7 @@
               </ul>
             </li>
             <% if (req.session.login && req.session.biz) { %>
-              <li><a href="/register_product">판매상품등록</a></li>
+              <li><a href="/register_product">판매상품 등록</a></li>
             <% } %>
 
             <% if (req.session.login) { %>
@@ -48,7 +48,8 @@
                   <li><a href="/register_bizinfo">판매자등록</a></li>
                 <% } %>
                 <% if (req.session.biz) { %>
-                  <li><a href="/sot_my_product">판매상품관리</a></li>
+                  <li><a href="/sot_my_product">판매상품 관리</a></li>
+                  <li><a href="/contract_seller">판매계약 관리</a></li>
                 <% } %>
 
                 <li><a href="/contract_buyer">구매계약리스트</a></li>

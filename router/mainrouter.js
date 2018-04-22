@@ -265,6 +265,48 @@ module.exports = function(app)
   });
 
 
+  app.get('/contract_seller', function(req, res){
+
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").contract_list_seller(req, res, function(err, data){
+          callback(err, data);
+        });
+      }
+    ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
+        var result = require('../src/ctl_util').contract_seller_list_html_maker(results[0]);
+        res.render('../sot_contract_seller.html', {req : req, res : res, html : result });
+      }
+    );
+  });
+  app.post('/get_contract_seller_paging', function(req, res){
+
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").contract_list_seller(req, res, function(err, data){
+          callback(err, data);
+        });
+      }
+    ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
+        var result = require('../src/ctl_util').contract_seller_list_html_maker(results[0]);
+        res.send(result);
+      }
+    );
+  });
+
+
   app.get('/favorite_product', function(req, res){
     var async = require('async');
 
@@ -410,6 +452,8 @@ module.exports = function(app)
 
   //상품설명이미지 등록 : summernote에서 발송
   app.post('/action_edit_product_image', upload.single('imagefile'), require("../src/ctl_product").register_product_edit_image);
+
+  app.post('/action_update_contract_stat', require("../src/ctl_product").update_contract_stat);
 
   app.get('/register_product', function(req, res){
 

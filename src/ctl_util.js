@@ -16,22 +16,68 @@ exports.contract_list_html_maker = function(contract_list) {
   for(var i=0; i < contract_list.length; i++ ) {
     result +="<article class=\"article_box\">";
     result +="  <a href=\"javascript:view_prod_detail('"+contract_list[i].prod_id+"')\" class=\"image\">";
+    result +="    <div style=\"color:#000000\">"+contract_list[i].logged_date+" </div>";
     result +="    <div class=\"small_img_box\"><img src=\"/uploads/"+contract_list[i].img_url+"\" class=\"small_img_clip\" /></div>";
     result +="  </a>";
     result +="  <div class=\"content\" style=\"margin-left:10px\">";
-    result +="    <div style=\"margin-bottom:10px\">";
-    result +="      <span id=\"CNTR_STAT_"+contract_list[i].id +"\">"+ contract_list[i].contract_status_val +"</span>";
 
+    result +="    <div style=\"margin-bottom:10px;position:relative\">";
+    result +="      <span id=\"CNTR_STAT_"+contract_list[i].id +"\">"+ contract_list[i].contract_status_val +"</span>";
     if (contract_list[i].contract_status == "REG") {
-      result +="        <span id=\"REG_"+contract_list[i].id+"\">";
-      result +="        [<a href=\"javascript:doConfirmContract("+ contract_list[i].id +")\">Confirm</a> /";
-      result +="        <a href=\"javascript:doCancelContract("+contract_list[i].id+")\">Cancel</a>]";
-      result +="        </span>";
+      result +="    <span id=\"REG_"+contract_list[i].id+"\">";
+      result +="       [<a href=\"javascript:doConfirmContract("+ contract_list[i].id +")\">구매확정</a> /";
+      result +="       <a href=\"javascript:doCancelContract("+contract_list[i].id+")\">구매취소</a>]";
+      result +="    </span>";
     }
+    //result +="      <span style=\"position:absolute;right:3px\">계약 : "+contract_list[i].logged_date+" </span>";
     result +="    </div>";
+
     result +="    <div>"+contract_list[i].prod_name+"</div>";
     result +="    <div>"+contract_list[i].price_sot.toFixed(2)+" SOT ("+contract_list[i].price_krw+" KRW) </div>";
     result +="    <div>결제지갑 : "+contract_list[i].buyer_account_no+" </div>";
+
+    if(contract_list[i].logistics_yn == "Y") {
+      result +="    <div class='logis_text_box'><div class='logis_text_content'>택배주소 : ("+contract_list[i].logis_zip+") "+contract_list[i].logis_addr1+" "+contract_list[i].logis_addr2+"</div></div>";
+    }
+
+    result +="  </div>";
+    result +="</article>";
+  }
+
+   return result;
+};
+
+
+exports.contract_seller_list_html_maker = function(contract_list) {
+
+  var result = "";
+
+  if(contract_list.length == 0) {
+    return  "NO_DATA";
+  }
+
+  for(var i=0; i < contract_list.length; i++ ) {
+    result +="<article class=\"article_box\">";
+    result +="  <a href=\"javascript:view_prod_detail('"+contract_list[i].prod_id+"')\" class=\"image\">";
+    result +="    <div style=\"color:#000000\">"+contract_list[i].logged_date+" </div>";
+    result +="    <div class=\"small_img_box\"><img src=\"/uploads/"+contract_list[i].img_url+"\" class=\"small_img_clip\" /></div>";
+    result +="  </a>";
+    result +="  <div class=\"content\" style=\"margin-left:10px\">";
+
+    result +="    <div style=\"margin-bottom:10px;position:relative\">";
+    result +="      <span id=\"CNTR_STAT_"+contract_list[i].id +"\">"+ contract_list[i].contract_status_val +"</span>";
+    if (contract_list[i].contract_status == "REG") {
+      result +="    <span id=\"REG_"+contract_list[i].id+"\">";
+      //result +="       [<a href=\"javascript:doConfirmContract("+ contract_list[i].id +")\">구매확정</a> /"; //판매자는 확정 못함
+      result +="       [<a href=\"javascript:doCancelContract("+contract_list[i].id+")\">판매취소</a>]";
+      result +="    </span>";
+    }
+    //result +="      <span style=\"position:absolute;right:3px\">계약 : "+contract_list[i].logged_date+" </span>";
+    result +="    </div>";
+
+    result +="    <div>"+contract_list[i].prod_name+"</div>";
+    result +="    <div>"+contract_list[i].price_sot.toFixed(2)+" SOT ("+contract_list[i].price_krw+" KRW) </div>";
+    result +="    <div>결제지갑 : "+contract_list[i].seller_account_no+" </div>";
 
     if(contract_list[i].logistics_yn == "Y") {
       result +="    <div class='logis_text_box'><div class='logis_text_content'>택배주소 : ("+contract_list[i].logis_zip+") "+contract_list[i].logis_addr1+" "+contract_list[i].logis_addr2+"</div></div>";

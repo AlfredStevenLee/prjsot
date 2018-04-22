@@ -43,9 +43,9 @@
 														Category : <select name="prod_cat" id="prod_cat" data-validation="required"><%- prod_category %></select> </br>
 														Product Name : <input type="text" value="<%-prod.prod_name%>" name="prod_name" id="prod_name" data-validation="required length" data-validation-length="4-30"> </br>
 														Main Image : <div class="image" style="width:100%"><img id="preview_box" src="/uploads/<%-prod.img_url%>" style="width:70%"></div><input type="file" name="prod_img" id="prod_image"> </br></br>
-														Price(KRW) : <input type="text" value="<%-prod.price_krw%>" name="prod_price_krw" id="prod_price_krw" data-validation="required number"> </br>
-														Price(SOT) : 현재 SOT시세 <%-currency.sot_krw%>원  <input type="text" value="<%-prod.price_sot%>" name="prod_price_sot" id="prod_price_sot" readonly> </br>
-														Price(ETH) : 현재 ETH시세 <%-currency.eth_krw%>원 <input type="text" value="<%-prod.price_eth%>" name="prod_price_eth" id="prod_price_eth" readonly> </br>
+														Price(KRW) : 현재 시세가 <%-(currency.sot_krw*prod.price_sot).toFixed(0)%>원 <input type="text" value="<%-prod.price_krw.toFixed(0)%>" name="prod_price_krw" id="prod_price_krw" data-validation="required number"> </br>
+														Price(SOT) : 현재 SOT시세 <%-currency.sot_krw%>원  <input type="text" value="<%-prod.price_sot.toFixed(18)%>" name="prod_price_sot" id="prod_price_sot" readonly> </br>
+														Price(ETH) : 현재 ETH시세 <%-currency.eth_krw%>원 <input type="text" value="<%-prod.price_eth.toFixed(18)%>" name="prod_price_eth" id="prod_price_eth" readonly> </br>
 														Logistics Y/N : <input type="radio" name="prod_logis_yn" id="prod_logis_y" value="Y"> <label for="prod_logis_y">Yes</label> / <input type="radio" name="prod_logis_yn" id="prod_logis_n" value="N"><label for="prod_logis_n">No</label> </br>
 														Activation Y/N : <input type="radio" name="prod_active_yn" id="prod_active_y" value="Y"> <label for="prod_active_y">Yes</label> / <input type="radio" name="prod_active_yn" id="prod_active_n" value="N"><label for="prod_active_n">No</label> </br>
 														<!-- Description : <textarea name="prod_desc" id="prod_desc" data-validation="required length" data-validation-length="min8"></textarea> </br> -->
@@ -53,7 +53,11 @@
 														<input type="hidden" name="prod_desc" id="prod_desc" value="">
 														<input type="hidden" name="img_origin" id="img_origin" value="<%-prod.img_url%>">
 														<input type="hidden" name="prod_id" id="prod_id" value="<%-prod.id%>">
-														<div id="prod_preview" class="box" style="overflow:scroll;height:300px"><%-prod.description%></div>
+														<div id="prod_preview" class="box" style="overflow:scroll;height:300px">
+															<% if (prod.description != "null") { %>
+															  <%-prod.description%>
+															<% } %>
+														</div>
 														<input type="submit" id="product_regist" value="상품수정">
 
 													</form>
@@ -141,11 +145,11 @@
 				cache:false,
 				contentType:false,
 				processData:false,
-				success:function(data)
+				success:function(data) {
 					if(checkRestData(data)) {
 						return false;
 					}
-					
+
 					var p_id = $("#prod_id").val();
 					$("#regist_form").html("Product updated successfully!");
 					setTimeout("window.location.replace('http://127.0.0.1:8080/modify_product?prod_id="+p_id+"')", 2000);

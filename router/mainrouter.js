@@ -238,7 +238,7 @@ module.exports = function(app)
           require('../src/ctl_util').errorHandler(req, res, err);
           return false;
         }
-        var result = require('../src/ctl_util').contract_list_html_maker(results[0]);
+        var result = require('../src/ctl_util').contract_buyer_list_html_maker(results[0]);
         res.render('../sot_contract_buyer.html', {req : req, res : res, html : result });
       }
     );
@@ -258,7 +258,7 @@ module.exports = function(app)
           require('../src/ctl_util').errorHandler(req, res, err);
           return false;
         }
-        var result = require('../src/ctl_util').contract_list_html_maker(results[0]);
+        var result = require('../src/ctl_util').contract_buyer_list_html_maker(results[0]);
         res.send(result);
       }
     );
@@ -436,6 +436,12 @@ module.exports = function(app)
   app.post('/action_config_member', require("../src/ctl_member").config_member);
 
   app.post('/action_check_member_email', require("../src/ctl_member").check_member_email);
+
+  app.post('/action_get_seller_info', require("../src/ctl_member").get_seller_info);
+
+  app.post('/action_get_buyer_info', require("../src/ctl_member").get_buyer_info);
+
+  app.post('/action_send_msg', require("../src/ctl_member").send_msg);
 
   app.post('/action_register_bizinfo', require("../src/ctl_member").register_bizinfo);
 

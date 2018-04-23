@@ -96,6 +96,12 @@
 																	상세주소 <input type="text" name="logis_addr2" id="logis_addr2" style="width:80%;display:inline-block">
 															  </div>
 															</div>
+															<div id="contact_input_box" style="margin-top:10px;margin-bottom:20px">
+															  <div style="margin-bottom:12px"><li>계약진행을 위해 사용할 휴대폰 번호를 입력하여 주세요</li></div>
+																<div style="padding-left:20px;">
+																	휴대폰 <input type="text" name="buyer_phone" id="buyer_phone" style="width:80%;display:inline-block" maxlength="25">
+															  </div>
+															</div>
 															<input type="button" value="상품을 구매합니다" style="display:block;margin-top:5px;margin-bottom:15px;width:100%" onclick="buy_product(<%-prod_detail[0].id%>)">
 															<div>※ 상품구매시 계약만 체결되며 "구매확정"전 까지는 결제처리가 되지 않습니다.<br>
 																   ※ 서비스를 받으신 후 "마이페이지 > 구매계약리스트"에서 최종 확정을 해 주십시요.
@@ -191,6 +197,7 @@
 			var p_logis_zip = $("#logis_zip").val();
 			var p_logis_addr1 = $("#logis_addr1").val();
 			var p_logis_addr2 = $("#logis_addr2").val();
+			var p_buyer_phone = $("#buyer_phone").val();
 
 			if (logis_yn == "Y") {
 				if((p_logis_zip == "") || (p_logis_addr1 == "") || (p_logis_addr2 == "")) {
@@ -198,6 +205,12 @@
 					return false;
 				}
 			}
+
+			if(p_buyer_phone == "") {
+				alert("구매시 판매자와 연락할 전화번호를 입력해 주십시요.\n전화번호는 이번 계약에서만 일회성으로 사용됩니다.");
+				return false;
+			}
+
 
 			$("#detail_form").html("<span style='color:red'>Now registering... wait a minute!</span>");
 
@@ -212,7 +225,8 @@
 				contract_address:contractAddress,
 				logis_zip:p_logis_zip,
 				logis_addr1:p_logis_addr1,
-				logis_addr2:p_logis_addr2
+				logis_addr2:p_logis_addr2,
+				buyer_phone:p_buyer_phone
 			},
 			function(prod_contract_no, status){
 				if(status == "success"){

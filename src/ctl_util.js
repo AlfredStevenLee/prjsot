@@ -5,7 +5,7 @@ var dbpool = require("./dbcon").pool;
 //아래와 같이 export를 통해 하나씩 메소드를 지정하고 그 내부에서 렌더링 할 파일로 redirection하면서 결과값을 함게 보내 줌
 
 
-exports.contract_list_html_maker = function(contract_list) {
+exports.contract_buyer_list_html_maker = function(contract_list) {
 
   var result = "";
 
@@ -19,8 +19,8 @@ exports.contract_list_html_maker = function(contract_list) {
     result +="    <div style=\"color:#000000\">"+contract_list[i].logged_date+" </div>";
     result +="    <div class=\"small_img_box\"><img src=\"/uploads/"+contract_list[i].img_url+"\" class=\"small_img_clip\" /></div>";
     result +="  </a>";
-    result +="  <div class=\"content\" style=\"margin-left:10px\">";
 
+    result +="  <div class=\"content\" style=\"margin-left:10px\">";
     result +="    <div style=\"margin-bottom:10px;position:relative\">";
     result +="      <span id=\"CNTR_STAT_"+contract_list[i].id +"\">"+ contract_list[i].contract_status_val +"</span>";
     if (contract_list[i].contract_status == "REG") {
@@ -39,6 +39,8 @@ exports.contract_list_html_maker = function(contract_list) {
     if(contract_list[i].logistics_yn == "Y") {
       result +="    <div class='logis_text_box'><div class='logis_text_content'>택배주소 : ("+contract_list[i].logis_zip+") "+contract_list[i].logis_addr1+" "+contract_list[i].logis_addr2+"</div></div>";
     }
+
+    result +="    <div><a href='javascript:viewSellerInfo("+contract_list[i].seller_id+")'>판매자정보</a> | <a href='javascript:msgTo("+contract_list[i].seller_id+","+contract_list[i].id+")'>문의하기</a></div>";
 
     result +="  </div>";
     result +="</article>";
@@ -80,8 +82,10 @@ exports.contract_seller_list_html_maker = function(contract_list) {
     result +="    <div>결제지갑 : "+contract_list[i].seller_account_no+" </div>";
 
     if(contract_list[i].logistics_yn == "Y") {
-      result +="    <div class='logis_text_box'><div class='logis_text_content'>택배주소 : ("+contract_list[i].logis_zip+") "+contract_list[i].logis_addr1+" "+contract_list[i].logis_addr2+"</div></div>";
+      result +="    <div class='logis_text_box'><div class='logis_text_content' id='logis_addr_"+contract_list[i].id+"'>택배주소 : ("+contract_list[i].logis_zip+") "+contract_list[i].logis_addr1+" "+contract_list[i].logis_addr2+"</div></div>";
     }
+
+    result +="    <div><a href=\"javascript:viewBuyerInfo("+contract_list[i].buyer_id+","+contract_list[i].id+", 'logis_addr_"+contract_list[i].id+"')\">구매자정보</a> | <a href='javascript:msgTo("+contract_list[i].buyer_id+","+contract_list[i].id+")'>쪽지보내기</a></div>";
 
     result +="  </div>";
     result +="</article>";

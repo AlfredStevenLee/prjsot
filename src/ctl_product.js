@@ -619,6 +619,7 @@ exports.buy_product = function(req, res, next) {
   var logis_zip = common_util.checkNullString(param.logis_zip);
   var logis_addr1 = common_util.checkNullString(param.logis_addr1);
   var logis_addr2 = common_util.checkNullString(param.logis_addr2);
+  var buyer_phone = param.buyer_phone;
 
   //console.log(">> prod id : "+JSON.stringify(param)+" / "+param.prod_id);
   //console.log(">> buyer id : "+buyer_id);
@@ -634,14 +635,14 @@ exports.buy_product = function(req, res, next) {
 
     //Make Query  KRW 원화는 현재 시세로 다시 계산해서 등록함
     var sql = "insert into contract ";
-    sql += "select null, a.id, a.register_id, b.id, ?, c.payment_wallet_addr, ?, (select e.sot_krw*a.price_sot from currency e order by id desc limit 0,1), a.price_sot, a.price_eth, 'INI', ?, ?, ?, 0, null, now() ";
+    sql += "select null, a.id, a.register_id, b.id, ?, c.payment_wallet_addr, ?, (select e.sot_krw*a.price_sot from currency e order by id desc limit 0,1), a.price_sot, a.price_eth, 'INI', ?, ?, ?, ?, 0, null, now() ";
     sql += " from product a, member b, provider c ";
     sql += " where a.id = ? and b.id = ? and c.register_id = a.register_id";
     //var param = req.body;
     //console.log(">> start register");
 
     //Execute SQL : save contract info to db
-    connection.query(sql, [contract_address, buyer_account, logis_zip, logis_addr1, logis_addr2, prod_id, buyer_id] , function(err_sql, rows)
+    connection.query(sql, [contract_address, buyer_account, logis_zip, logis_addr1, logis_addr2, buyer_phone, prod_id, buyer_id] , function(err_sql, rows)
     {
       if (err_sql)
       {

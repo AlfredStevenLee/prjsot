@@ -62,6 +62,35 @@
 
 		});
 
+
+		function viewSellerInfo(sellerId) {
+			var addr = "/action_get_seller_info";
+
+			$.post(addr,
+			{
+				seller_id:sellerId
+			},
+			function(data, status){
+				if(status == "success"){
+					if(checkRestData(data)) {
+						return false;
+					}
+					dialog.dialog("option","title","판매자");
+					$("#dialog_box").html("<span class='ui-icon ui-icon-person'></span> "+data.provider_name+"<br><span class='ui-icon ui-icon-contact'></span> "+data.contact_phone+"<br><span class='ui-icon ui-icon-flag'></span> "+data.contact_address);
+					dialog.dialog("open");
+				} else {
+					alert("There's some problem . Please try it in seconds.");
+				}
+			});
+		}
+
+		function msgTo(_to, _contract_id) {
+			$("#_msg_to").val(_to);
+			$("#_msg_contract_id").val(_contract_id);
+			msg_dialog.dialog("open");
+		}
+
+
 		function view_prod_detail(prod_id) {
 			//alert("선택상품코드 : "+prod_id);
 			window.location.href = "/sot_view_product?prod_id="+prod_id;

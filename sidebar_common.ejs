@@ -111,3 +111,83 @@
 
     </div>
   </div>
+
+
+  <!-- Common Dialog -->
+  <div id="dialog_box" title=""></div>
+  <div id="msg_send_box" title="">
+    <form id="msg_send_form">
+      <textarea id="_msg_text" style="width:300px;height:150px;"></textarea>
+      <input type="hidden" id="_msg_to">
+      <input type="hidden" id="_msg_contract_id">
+    </form>
+  </div>
+
+  <script>
+    var dialog;
+    var msg_dialog;
+    $(document).ready(function(){
+      dialog = $( "#dialog_box" ).dialog({
+                 autoOpen: false,
+                 modal: true,
+                 buttons: {
+                   확인: function() {
+                     $( this ).dialog( "close" );
+                   }
+                 }
+               });
+     msg_dialog = $( "#msg_send_box" ).dialog({
+                autoOpen: false,
+                title: "쪽지보내기",
+                modal: true,
+                width:330,
+                buttons: {
+                  전송: function() {
+                    sendMsg();
+                    //$( this ).dialog( "close" );
+                  }
+                },
+                close: function() {
+                  $("#_msg_to").val("");
+                  $("#_msg_contract_id").val("");
+                  $("#_msg_text").val("");
+                }
+              });
+    });
+
+    function sendMsg() {
+      var addr = "/action_send_msg";
+      var p_to = $("#_msg_to").val();
+			var p_contract_id = $("#_msg_contract_id").val();
+      var p_msg_text = $("#_msg_text").val();
+      var p_msg_type = 'MSG';
+
+			$.post(addr,
+			{
+				msg_to:p_to,
+        msg_contract_id:p_contract_id,
+        msg_text:p_msg_text,
+        msg_type:p_msg_type
+			},
+			function(data, status){
+				if(status == "success"){
+					if(checkRestData(data)) {
+						return false;
+					}
+          msg_dialog.dialog("close");
+          $("#_msg_to").val("");
+          $("#_msg_contract_id").val("");
+          $("#_msg_text").val("");
+          /*
+					dialog.dialog("option","title","판매자");
+					$("#dialog_box").html("<span class='ui-icon ui-icon-person'></span> "+data.provider_name+"<br><span class='ui-icon ui-icon-contact'></span> "+data.contact_phone+"<br><span class='ui-icon ui-icon-flag'></span> "+data.contact_address);
+					dialog.dialog("open");
+          */
+				} else {
+					alert("There's some problem . Please try it in seconds.");
+				}
+			});
+    }
+
+
+  </script>

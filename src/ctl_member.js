@@ -174,6 +174,120 @@ exports.check_member_email = function(req, res, next) {
   })
 };
 
+
+exports.get_seller_info = function(req, res, next) {
+  var param = req.body;
+  var seller_id = param.seller_id;
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      next(err);
+      return false;
+    }
+
+    //Make Query
+    var sql = "select provider_name, contact_phone, contact_address from provider where id = ? ";
+
+    //Execute SQL
+    connection.query(sql, seller_id, function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : check member email");
+        next(err_sql);
+        return false;
+      }
+
+      res.send(rows[0]);
+
+      //Release connection
+      connection.release();
+    })
+  })
+};
+
+exports.get_buyer_info = function(req, res, next) {
+  var param = req.body;
+  var buyer_id = param.buyer_id;
+  var contract_id = param.contract_id;
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      next(err);
+      return false;
+    }
+
+    //Make Query
+    var sql = "select a.name, (select b.buyer_contact_phone from contract b where b.id = ?) as phone from member a where a.id = ?; ";
+
+    //Execute SQL
+    connection.query(sql, [contract_id, buyer_id], function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : check member email");
+        next(err_sql);
+        return false;
+      }
+
+      res.send(rows[0]);
+
+      //Release connection
+      connection.release();
+    })
+  })
+};
+
+
+exports.send_msg = function(req, res, next) {
+  var param = req.body;
+  var msg_from = req.session.member_id;
+  var msg_to = param.msg_to;
+  var msg_contract_id = common_util.checkNullString(param.msg_contract_id);
+  var msg_text = common_util.checkNullString(param.msg_text);
+  var msg_type = param.msg_type;
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      next(err);
+      return false;
+    }
+
+    //Make Query
+    // type : MSG 일반쪽지, NTF 관리자공지, ALM 경고 및 알람
+    var sql = "insert into msgbox values(?,?,?,?,?,now()) ";
+
+    //Execute SQL
+    connection.query(sql, [msg_from, msg_to, msg_text, msg_contract_id, msg_type], function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : check member email");
+        next(err_sql);
+        return false;
+      }
+
+      res.send("REGIST_OK");
+
+      //Release connection
+      connection.release();
+    })
+  })
+};
+
+
 exports.config_member = function(req, res, next) {
 
   var param = req.body;

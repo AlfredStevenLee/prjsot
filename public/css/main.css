@@ -4133,6 +4133,23 @@
 	box-shadow:3px 3px 10px #cccccc;
 	height: 467px;
 }
+.msgbox_logdate {
+	position:absolute;
+	right:10px;
+}
+.msgbox_text {
+
+}
+.msgbox_header {
+	background:#f2f2f2;
+	padding:4px;
+}
+.msgbox_header_in {
+	background:#f2f2f2;
+}
+.msgbox_header_out {
+	background:#d9d9d9;
+}
 
 @media screen and (max-width: 480px) {
 	.small_img_box {

@@ -4,6 +4,65 @@ var dbpool = require("./dbcon").pool;
 //메인 컨트롤러 파일
 //아래와 같이 export를 통해 하나씩 메소드를 지정하고 그 내부에서 렌더링 할 파일로 redirection하면서 결과값을 함게 보내 줌
 
+exports.msg_list_html_maker = function(req, msglist) {
+
+  var result = "";
+  var myid = req.session.member_id;
+
+  if(msglist.length == 0) {
+    return  "NO_DATA";
+  }
+  /*
+  +---------------------+------------------+------+-----+---------+-------+
+  | Field               | Type             | Null | Key | Default | Extra |
+  +---------------------+------------------+------+-----+---------+-------+
+  | msg_from            | int(10) unsigned | NO   |     | NULL    |       |
+  | msg_to              | int(10) unsigned | NO   |     | NULL    |       |
+  | msg_text            | varchar(500)     | YES  |     | NULL    |       |
+  | related_contract_id | int(10) unsigned | YES  |     | NULL    |       |
+  | type                | char(3)          | NO   |     | NULL    |       |
+  | logdate             | datetime         | NO   |     | NULL    |       |
+  +---------------------+------------------+------+-----+---------+-------+
+  */
+
+  for(var i=0; i < msglist.length; i++ ) {
+    result +="<article class=\"article_box\">";
+
+    result +="  <div class=\"content\" >";
+
+    if(msglist[i].msg_from == myid) {
+      //보낸 메시지
+      result +="    <div class='msgbox_header msgbox_header_out' style=\"margin-bottom:10px;position:relative\">";
+      result += "      <span class='ui-icon ui-icon-arrowthick-1-w'></span><span>"+msglist[i].to_name+"</span><a href='javascript:msgTo("+msglist[i].msg_to+","+msglist[i].related_contract_id+")'><span class='ui-icon ui-icon-comment'></span></a>";
+    } else {
+      //받은 메시지
+      result +="    <div class='msgbox_header msgbox_header_in' style=\"margin-bottom:10px;position:relative\">";
+      result += "      <span class='ui-icon ui-icon-arrowthick-1-e'></span><span>"+msglist[i].from_name+"</span><a href='javascript:msgTo("+msglist[i].msg_from+","+msglist[i].related_contract_id+")'><span class='ui-icon ui-icon-comment'></span></a>";
+    }
+
+    result += "        <span class='msgbox_logdate'>"+msglist[i].logdate+"</span>";
+
+    result +="    </div>";
+
+    result +="    <div class='msgbox_text'>"+msglist[i].msg_text+"</div>";
+
+    if(msglist[i].related_contract_id > 0) {
+      if(msglist[i].seller_id == myid) {
+        //판매상품
+        result +="    <div class='msgbox_text'><a href='/contract_seller?cntrno="+msglist[i].related_contract_id+"'>판매계약</a></div>";
+      } else {
+        //구매상품
+        result +="    <div class='msgbox_text'><a href='/contract_buyer?cntrno="+msglist[i].related_contract_id+"'>구매계약</a></div>";
+      }
+    }
+
+    result +="  </div>";
+    result +="</article>";
+  }
+
+   return result;
+};
+
 
 exports.contract_buyer_list_html_maker = function(contract_list) {
 

@@ -430,6 +430,8 @@ exports.update_contract_stat = function(req, res, next) {
 
 exports.contract_list_buyer = function(req, res, callback) {
 
+  var contract_no = req.query.cntrno;
+
   //## for Paging ################################
   var pageNum = req.body.pageNum;
   var pageSize = 10;
@@ -451,7 +453,14 @@ exports.contract_list_buyer = function(req, res, callback) {
     }
 
     //Make Query
-    var sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val, b.logistics_yn, a.logis_zip, a.logis_addr1, a.logis_addr2, date_format(a.logdate,'%y/%m/%d %H:%i') as logged_date from contract a, product b, code c where buyer_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
+    var sql = "";
+
+    if(contract_no == undefined) {
+      sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val, b.logistics_yn, a.logis_zip, a.logis_addr1, a.logis_addr2, date_format(a.logdate,'%y/%m/%d %H:%i') as logged_date from contract a, product b, code c where buyer_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
+    } else {
+      sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val, b.logistics_yn, a.logis_zip, a.logis_addr1, a.logis_addr2, date_format(a.logdate,'%y/%m/%d %H:%i') as logged_date from contract a, product b, code c where buyer_id = ? and a.id = "+contract_no+" and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
+    }
+
     var buyer_id = req.session.member_id;
 
     //Execute SQL
@@ -477,6 +486,8 @@ exports.contract_list_buyer = function(req, res, callback) {
 
 exports.contract_list_seller = function(req, res, callback) {
 
+  var contract_no = req.query.cntrno;
+
   //## for Paging ################################
   var pageNum = req.body.pageNum;
   var pageSize = 10;
@@ -498,7 +509,14 @@ exports.contract_list_seller = function(req, res, callback) {
     }
 
     //Make Query
-    var sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val, b.logistics_yn, a.logis_zip, a.logis_addr1, a.logis_addr2, date_format(a.logdate,'%y/%m/%d %H:%i') as logged_date from contract a, product b, code c where seller_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
+    var sql = "";
+
+    if(contract_no == undefined) {
+      sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val, b.logistics_yn, a.logis_zip, a.logis_addr1, a.logis_addr2, date_format(a.logdate,'%y/%m/%d %H:%i') as logged_date from contract a, product b, code c where seller_id = ? and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
+    } else {
+      sql = "select a.id, a.prod_id, a.seller_id, a.buyer_id, a.smart_contract_no, a.seller_account_no, a.buyer_account_no, a.price_krw, a.price_sot, a.price_eth, a.contract_status, b.prod_name, b.img_url, c.cd_val as contract_status_val, b.logistics_yn, a.logis_zip, a.logis_addr1, a.logis_addr2, date_format(a.logdate,'%y/%m/%d %H:%i') as logged_date from contract a, product b, code c where seller_id = ? and a.id = "+contract_no+" and b.id = a.prod_id and c.cd = a.contract_status and c.cd_group='CNTR_STAT' order by a.logdate desc limit ?,? ";
+    }
+
     var _id = req.session.member_id;
 
     //Execute SQL

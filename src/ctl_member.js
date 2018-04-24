@@ -77,6 +77,65 @@ exports.verify_member = function(req, res, callback) {
 };
 
 
+exports.get_msg = function(req, res, callback) {
+
+  var param = req.body;
+  var inout = param.inout;
+  var myid = req.session.member_id;
+
+  //## for Paging ################################
+  var pageNum = req.body.pageNum;
+  var pageSize = 10;
+  if ((pageNum == undefined) || (pageNum < 1)) {
+    pageNum = 1;
+  }
+  var startPage = (pageNum-1)*pageSize;
+  //##############################################
+
+  //inout -> IN 받은거 / OUT 보낸거 / ALL 전체
+  if(inout == undefined) {
+    inout = "ALL";
+  }
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      //console.log(">> can't get sql connection!");
+      connection.release();
+      callback(err, null);
+      return false;
+    }
+
+    //내가 보낸 메시지
+    var sql = "";
+    if(inout == "ALL") {
+      sql = "select a.msg_from, a.msg_to, a.msg_text, a.type, a.related_contract_id, (select e.seller_id from contract e where e.id=a.related_contract_id) as seller_id, date_format(a.logdate,'%y/%m/%d %H:%i') as logdate, (select b.name from member b where b.id = a.msg_from) as from_name, (select c.name from member c where c.id = a.msg_to) as to_name from msgbox a where a.msg_from = "+myid+" or a.msg_to = "+myid+" order by a.logdate desc limit "+startPage+", "+pageSize;
+    } else if(inout == "IN") {
+      sql = "select a.msg_from, a.msg_to, a.msg_text, a.type, a.related_contract_id, (select e.seller_id from contract e where e.id=a.related_contract_id) as seller_id, date_format(a.logdate,'%y/%m/%d %H:%i') as logdate, b.name as from_name, 'me' as to_name from msgbox a, member b where a.msg_to = "+myid+" and b.id = a.msg_from order by a.logdate desc limit "+startPage+", "+pageSize;
+    } else {
+      //out
+      sql = "select a.msg_from, a.msg_to, a.msg_text, a.type, a.related_contract_id, (select e.seller_id from contract e where e.id=a.related_contract_id) as seller_id, date_format(a.logdate,'%y/%m/%d %H:%i') as logdate, 'me' as from_name, c.name as to_name from msgbox a, member c where a.msg_from = "+myid+" and c.id = a.msg_to order by a.logdate desc limit "+startPage+", "+pageSize;
+    }
+
+    //Execute SQL
+    connection.query(sql, function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : get msg : "+err_sql);
+        callback(err_sql, null);
+        return false;
+      }
+
+      callback(null, rows);
+      connection.release();
+    });
+  });
+};
+
 
 exports.get_bizinfo = function(req, res, callback) {
   var bizyn = req.session.biz;
@@ -251,7 +310,7 @@ exports.send_msg = function(req, res, next) {
   var param = req.body;
   var msg_from = req.session.member_id;
   var msg_to = param.msg_to;
-  var msg_contract_id = common_util.checkNullString(param.msg_contract_id);
+  var msg_contract_id = common_util.checkNullNumber(param.msg_contract_id);
   var msg_text = common_util.checkNullString(param.msg_text);
   var msg_type = param.msg_type;
 
@@ -266,7 +325,7 @@ exports.send_msg = function(req, res, next) {
 
     //Make Query
     // type : MSG 일반쪽지, NTF 관리자공지, ALM 경고 및 알람
-    var sql = "insert into msgbox values(?,?,?,?,?,now()) ";
+    var sql = "insert into msgbox values(null,?,?,?,?,?,now()) ";
 
     //Execute SQL
     connection.query(sql, [msg_from, msg_to, msg_text, msg_contract_id, msg_type], function(err_sql, rows)

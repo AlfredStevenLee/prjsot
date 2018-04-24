@@ -29,7 +29,7 @@
 							<!-- Section -->
 								<section>
 									<header class="major">
-										<h2>판매계약 진행 내역</h2>
+										<h2>메시지 함</h2>
 									</header>
 									<div id="msg_box" style="color:red;margin-bottom:10px"></div>
 									<div id="contentsBox" class="features">
@@ -58,30 +58,25 @@
 
 		$(document).ready(function(){
 
-			pagingController($("#contentsBox"), "/get_contract_seller_paging");
+			pagingController($("#contentsBox"), "/get_msg_box_paging");
 
 		});
 
-		function viewBuyerInfo(buyerId, contractId, logisId) {
-			var addr = "/action_get_buyer_info";
+
+		function viewSellerInfo(sellerId) {
+			var addr = "/action_get_seller_info";
 
 			$.post(addr,
 			{
-				buyer_id:buyerId,
-				contract_id:contractId
+				seller_id:sellerId
 			},
 			function(data, status){
 				if(status == "success"){
 					if(checkRestData(data)) {
 						return false;
 					}
-					dialog.dialog("option","title","구매자");
-					var logis_address = "";
-
-					if($("#"+logisId).text() != "") {
-						logis_address = "<br><span class='ui-icon ui-icon-flag'></span>"+$("#"+logisId).text();
-					}
-					$("#dialog_box").html("<span class='ui-icon ui-icon-person'></span> "+data.name+"<br><span class='ui-icon ui-icon-contact'></span> "+data.phone+" "+logis_address);
+					dialog.dialog("option","title","판매자");
+					$("#dialog_box").html("<span class='ui-icon ui-icon-person'></span> "+data.provider_name+"<br><span class='ui-icon ui-icon-contact'></span> "+data.contact_phone+"<br><span class='ui-icon ui-icon-flag'></span> "+data.contact_address);
 					dialog.dialog("open");
 				} else {
 					alert("There's some problem . Please try it in seconds.");
@@ -89,7 +84,6 @@
 			});
 		}
 
-		
 
 		function view_prod_detail(prod_id) {
 			//alert("선택상품코드 : "+prod_id);

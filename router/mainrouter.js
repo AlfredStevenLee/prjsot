@@ -398,6 +398,46 @@ module.exports = function(app)
     );
   });
 
+  app.get('/msgbox', function(req, res){
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_member").get_msg(req, res, function(err, data) {
+          callback(err, data);
+        });
+      }
+    ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
+        var result = require('../src/ctl_util').msg_list_html_maker(req, results[0]);
+        res.render('../sot_msg_box.html', {req : req, res : res, html : result });
+      }
+    );
+  });
+  app.post('/get_msg_box_paging', function(req, res){
+
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_member").get_msg(req, res, function(err, data) {
+          callback(err, data);
+        });
+      }
+    ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
+        var result = require('../src/ctl_util').msg_list_html_maker(req, results[0]);
+        res.send(result);
+      }
+    );
+  });
+
 
   app.get('/sot_under_mgmt', function(req, res){
     res.render('../sot_under_mgmt.html', {req : req, res : res});

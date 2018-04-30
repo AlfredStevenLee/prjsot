@@ -11,7 +11,7 @@
 		<% include ./head_common.ejs %>
 
 
-	</head>
+	</head> 
 
 
 	<body>
@@ -152,7 +152,7 @@
 
 					var p_id = $("#prod_id").val();
 					$("#regist_form").html("Product updated successfully!");
-					setTimeout("window.location.replace('http://127.0.0.1:8080/modify_product?prod_id="+p_id+"')", 2000);
+					setTimeout("window.location.replace('http://127.0.0.1:8080/modify_product?prod_id="+p_id+"&biz="+bizsite+"')", 2000);
 				}
 			});
 		}

@@ -23,6 +23,57 @@ module.exports = function(app)
     require("../src/ctl_util").getCurrencyInfo("ETH");
   });
 
+
+  //Global 세션과 페이지 이동을 관리하는 미들웨어부
+  app.all('*',function(req, res, next){
+    var bizsite = req.query.biz;
+
+    var contents = req.path;
+
+    if ( (contents.indexOf("/images/") > -1) || (contents.indexOf("/js/") > -1) || (contents.indexOf("/fonts/") > -1) || (contents.indexOf("/css/") > -1) || (contents.indexOf("/uploads/") > -1) || (contents.indexOf("/jquery-ui-1.12.1/") > -1) || (req.method == "POST") ) {
+      next();
+      return false;
+    }
+
+    if(bizsite == undefined) {
+      bizsite = "sot";
+      req.session.bizsite = true;
+      req.session.bizsite_name = "sot";
+      res.set("biz",encodeURIComponent(bizsite));
+      console.log("first : "+req.path+" / "+req.session.bizsite);
+      next();
+    } else {
+      console.log("session checked : "+req.path+" / "+req.session.bizsite);
+      if(!req.session.bizsite || (req.session.bizsite && (req.session.bizsite_name != bizsite)) ) {
+        //기존 셋팅된 bizsite가 없을 경우만 DB 조회
+        require("../src/ctl_product").get_bizsite_detail(req, res, bizsite, function(err, data){
+          if(data == undefined) {
+            //잘못된_등록되지않은 사이트 이름으로 기본값 셋팅
+            bizsite = "sot";
+            req.session.bizsite = true;
+            req.session.bizsite_name = "sot";
+            console.log("DB : not found name : "+req.session.bizsite);
+          } else {
+            req.session.bizsite = true;
+            req.session.bizsite_logo = data.logo_url;
+            req.session.bizsite_name = data.bizsite_name;
+            req.session.bizsite_desc = data.description;
+            req.session.bizsite_register = data.register_id;
+            console.log("DB : found & set name : "+req.session.bizsite);
+          }
+          res.set("biz",encodeURIComponent(bizsite));
+          next();
+        });
+      } else {
+        console.log("session check ok - passed : "+req.session.bizsite);
+        res.set("biz",encodeURIComponent(bizsite));
+        next();
+      }
+
+    }
+  });
+
+
   //test page
   app.get('/', function(req, res){
     res.render('sot_index.html', {req : req, res : res});
@@ -141,8 +192,12 @@ module.exports = function(app)
     );
   });
 
-
   app.get('/sotmain', function(req, res){
+
+    var bizsite = req.query.biz;
+    if(bizsite == undefined) {
+      bizsite = "sot";
+    }
 
     var async = require('async');
 
@@ -163,9 +218,7 @@ module.exports = function(app)
           return false;
         }
         var result = require('../src/ctl_util').product_html_maker(results[0], results[1]);
-
         res.render('../sot_main.html', {req : req, res : res, html:result });
-        //res.render('../sot_main.html', {req : req, res : res, prod_list : results[0], currency : results[1] });
       }
     );
   });
@@ -526,6 +579,28 @@ module.exports = function(app)
       }
     );
   });
+
+
+  app.get('/sot_bizsite_conf', function(req, res){
+    var async = require('async');
+
+    async.series([
+      function(callback){
+        require("../src/ctl_product").get_bizsite_info(req, res, function(err, data){
+          callback(err, data);
+        });
+      }
+    ],function(err, results) {
+        if(err) {
+          require('../src/ctl_util').errorHandler(req, res, err);
+          return false;
+        }
+        res.render('../sot_bizsite_conf.html', {req : req, res : res, bizsite_data : results[0]});
+      }
+    );
+  });
+
+  app.post('/action_bizsite_conf', upload.single('bizsite_img'), require("../src/ctl_product").register_bizsite_conf);
 
 
   app.post('/action_buy_product', require("../src/ctl_product").buy_product);

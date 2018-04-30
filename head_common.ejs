@@ -23,6 +23,14 @@
 <script type="javascript" src="https://github.com/ethereum/web3.js/tree/develop/dist/web3.min.js"></script>
 
 <script>
+var bizsite = '<%-decodeURIComponent(res.get("biz"))%>';
+
+function pageUrl(url_address) {
+  window.location.href = url_address+"?biz="+bizsite;
+}
+function pageUrlAddParam(url_address) {
+  window.location.href = url_address+"&biz="+bizsite;
+}
 
 var contractAddress = '0x96973bb06df09f065f343237d54eb7aab3aa112a';
 
@@ -46,7 +54,7 @@ function submit_logout() {
       if (data == "LOGOUT_SUCCESS")
       {
         //alert("Logout success!");
-        window.location.replace("/sotmain");
+        window.location.replace("/sotmain?biz="+bizsite);
       }
       else
       {

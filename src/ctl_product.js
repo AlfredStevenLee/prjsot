@@ -123,6 +123,73 @@ exports.register_product = function(req, res, next) {
 };
 
 
+exports.register_bizsite_conf = function(req, res, next) {
+  var param = req.body;
+  var reg_type = param.reg_type;
+  var bizsite_name = param.bizsite_name;
+
+  var bizsite_logo = "";
+  var img_origin = param.img_origin;
+  if (reg_type == "NEW") {
+    bizsite_logo = (!req.file) ? "def_bizsite_img.png" : req.file.filename;
+  } else {
+    bizsite_logo = (!req.file) ? img_origin : req.file.filename;
+  }
+
+  var bizsite_yn = param.bizsite_yn;
+  var bizsite_desc = param.prod_desc;
+
+
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+    if (err)
+    {
+      connection.release();
+      next(err);
+      return false;
+    }
+
+    /*
+    +--------------+------------------+------+-----+---------+----------------+
+    | Field        | Type             | Null | Key | Default | Extra          |
+    +--------------+------------------+------+-----+---------+----------------+
+    | id           | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+    | bizsite_name | varchar(30)      | NO   |     | NULL    |                |
+    | logo_url     | varchar(80)      | YES  |     | NULL    |                |
+    | description  | text             | YES  |     | NULL    |                |
+    | bizsite_yn   | char(1)          | YES  |     | NULL    |                |
+    | register_id  | int(10) unsigned | NO   |     | NULL    |                |
+    | logdate      | datetime         | NO   |     | NULL    |                |
+    +--------------+------------------+------+-----+---------+----------------+
+    */
+    //Make Query
+    var sql = "";
+    if(reg_type == "NEW") {
+      sql = "insert into bizsite values(null,?,?,?,?,?,now()) ";
+    } else {
+      sql = "update bizsite set bizsite_name=?, logo_url=?, description=?, bizsite_yn=?, logdate=now() where register_id=? ";
+    }
+    //Execute SQL
+    connection.query(sql, [bizsite_name, bizsite_logo, bizsite_desc, bizsite_yn, req.session.member_id] , function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql : "+err_sql);
+        next(err_sql);
+        return false;
+      }
+      //Send result & Redirect to view. Something have to be sent back
+      res.send("REGIST_SUCCESS");
+
+      //Release connection
+      connection.release();
+    })
+  })
+};
+
+
 exports.modify_product = function(req, res, next) {
   var param = req.body;
 
@@ -242,6 +309,76 @@ exports.get_favorite_list = function(req, res, callback) {
   });
 };
 
+//판매자 사이트 관리용
+exports.get_bizsite_info = function(req, res, callback) {
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      console.log(">> can't get sql connection!");
+      connection.release();
+      callback(err, null);
+      return false;
+    }
+
+    //Make Query
+    var sql = "select id, bizsite_name, logo_url, description, bizsite_yn from bizsite where register_id = ? ";
+
+    //Execute SQL
+    connection.query(sql, req.session.member_id, function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql");
+        callback(err_sql, null);
+        return false;
+      }
+
+      //Release connection
+      connection.release();
+      callback(null, rows[0]);
+    });
+  });
+};
+
+
+exports.get_bizsite_detail = function(req, res, bizsite, callback) {
+
+  //getConnection
+  dbpool.getConnection(function(err, connection){
+
+    if (err)
+    {
+      console.log(">> can't get sql connection!");
+      connection.release();
+      callback(err, null);
+      return false;
+    }
+
+    //Make Query
+    var sql = "select bizsite_name, logo_url, description, register_id from bizsite where bizsite_yn = 'Y' and  bizsite_name = ?  ";
+
+    //Execute SQL
+    connection.query(sql, bizsite, function(err_sql, rows)
+    {
+      if (err_sql)
+      {
+        connection.release();
+        console.log(">> error from sql");
+        callback(err_sql, null);
+        return false;
+      }
+
+      //Release connection
+      connection.release();
+      callback(null, rows[0]);
+    });
+  });
+};
+
 
 exports.my_biz_product = function(req, res, callback) {
 
@@ -317,6 +454,12 @@ exports.prod_list = function(req, res, callback) {
     sql += "          a.logistics_yn, count(b.prod_id) as sellcount ";
     sql += "     from product a left outer join contract b on b.prod_id = a.id ";
     sql += "    where a.active_yn = 'Y' ";
+
+    //판매자용 url로 들어왔을 경우 해당 판매자가 등록한 상품만 조회
+    if(req.session.bizsite && req.session.bizsite_name != "sot") {
+      sql += "        and a.register_id = "+req.session.bizsite_register;
+    }
+
     sql += "    group by a.id, a.prod_name, a.img_url, a.price_krw, a.price_sot, a.price_eth, a.logistics_yn order by a.id desc ";
     sql += "    limit ?, ?";
 

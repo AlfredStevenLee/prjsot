@@ -1,16 +1,26 @@
 
 <header id="header" style="position: -webkit-sticky; position: sticky;  top: 0; background: #ffffff; z-index:100; ">
-  <a href="/sotmain" class="logo" style=""><H2>SOT Market</H2></a>
+  <a href="javascript:pageUrl('/sotmain')" class="logo" style="">
+
+<% if (req.session.bizsite_name == "sot") { %>
+    <H2>"솥" 오픈마켓</H2>
+<% } else { %>
+    <img src="/uploads/<%-req.session.bizsite_logo%>" style="height : 60px">
+<% } %>
+
+  </a>
 
 
 
-  <div class="register" style="text-align:right;padding-top: 35px;padding-right:5px;">
+  <div class="register" style="text-align:right;padding-top:35px;padding-right:5px;">
 
     <% if (req.session.login) { %>
       <%= req.session.member_name %> / <a href="#" onclick="submit_logout()"> 로그아웃 </a>
     <% } else { %>
-        <a href="/login_member"> 로그인 </a> / <a href ="/register_member" style=""> 회원가입 </a>
+        <a href="javascript:pageUrl('/login_member')"> 로그인 </a> / <a href ="javascript:pageUrl('/register_member')" style=""> 회원가입 </a>
     <% } %>
+
+    <% /* decodeURIComponent(res.get("biz"))  */ %>
 
   </div>
   <!--div id="sizetest"></div-->

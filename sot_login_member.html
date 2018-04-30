@@ -90,7 +90,7 @@
 					//$("#regist_form").html("Regist OK! <br> Thank you for registration. <br> your email is "+email+". we sent confirmation email to you.");
 					if (data == "LOGIN_SUCCESS") {
 						$("#member_login_form").html("Login Success");
-						window.location.replace("/sotmain");
+						window.location.replace("/sotmain?biz="+bizsite);
 					} else if (data == "NOT_VERIFIED") {
 						$("#member_login_form").html("Your email isn't verified yet. Please verify first and activate account.");
 					}	else {

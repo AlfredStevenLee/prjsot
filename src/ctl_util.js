@@ -49,10 +49,10 @@ exports.msg_list_html_maker = function(req, msglist) {
     if(msglist[i].related_contract_id > 0) {
       if(msglist[i].seller_id == myid) {
         //판매상품
-        result +="    <div class='msgbox_text'><a href='/contract_seller?cntrno="+msglist[i].related_contract_id+"'>판매계약</a></div>";
+        result +="    <div class='msgbox_text'><a href=\"javascript:pageUrlAddParam(\'/contract_seller?cntrno="+msglist[i].related_contract_id+"\')\">판매계약</a></div>";
       } else {
         //구매상품
-        result +="    <div class='msgbox_text'><a href='/contract_buyer?cntrno="+msglist[i].related_contract_id+"'>구매계약</a></div>";
+        result +="    <div class='msgbox_text'><a href=\"javascript:pageUrlAddParam(\'/contract_buyer?cntrno="+msglist[i].related_contract_id+"\')\">구매계약</a></div>";
       }
     }
 

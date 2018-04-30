@@ -92,7 +92,7 @@
 		      if (r != null && r.blockNumber > 0) {
 		        $("#msg_box").html("<span style='color:blue'>SOT 환전이 완료되었습니다. 환전 확인을 위해 페이지를 다시 읽습니다. <br> 잠시만 기다려 주세요. </span>");
 		        filter.stopWatching();
-						setTimeout("window.location.replace('/exchange_sot')", 3000);
+						setTimeout("window.location.replace('/exchange_sot?biz="+bizsite+"')", 3000);
 		      }
 		   	});
 		 	});

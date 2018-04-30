@@ -11,7 +11,7 @@
             <%= req.session.member_email %> </br>
             <a href="#" onclick="submit_logout()"> 로그아웃 </a>
           <% } else { %>
-              <a href="/login_member"> 로그인 </a>
+              <a href="javascript:pageUrl('/login_member')"> 로그인 </a>
           <% } %>
 
         </section>
@@ -25,39 +25,40 @@
             <li><a href="index.html">SOT 소개</a></li>
             <li><a href="generic.html">이용약관</a></li>
             <% if (!req.session.login) { %>
-            <li><a href="/register_member">회원가입</a></li>
+            <li><a href="javascript:pageUrl('/register_member')">회원가입</a></li>
             <% } %>
-            <li><a href="/exchange_sot">SOT코인 환전센터</a></li>
+            <li><a href="javascript:pageUrl('/exchange_sot')">SOT코인 환전센터</a></li>
             <li>
               <span class="opener">상품카테고리</span>
               <ul>
-                <li><a href="/sot_product_list">전체 카테고리</a></li>
+                <li><a href="javascript:pageUrl('/sot_product_list')">전체 카테고리</a></li>
               </ul>
             </li>
             <% if (req.session.login && req.session.biz) { %>
-              <li><a href="/register_product">판매상품 등록</a></li>
+              <li><a href="javascript:pageUrl('/register_product')">판매상품 등록</a></li>
             <% } %>
 
             <% if (req.session.login) { %>
             <li>
               <span class="opener">마이페이지</span>
               <ul>
-                <li><a href="/config_member">계정설정</a></li>
+                <li><a href="javascript:pageUrl('/config_member')">계정설정</a></li>
 
                 <% if (!req.session.biz) { %>
-                  <li><a href="/register_bizinfo">판매자등록</a></li>
+                  <li><a href="javascript:pageUrl('/register_bizinfo')">판매자등록</a></li>
                 <% } %>
                 <% if (req.session.biz) { %>
-                  <li><a href="/sot_my_product">판매상품 관리</a></li>
-                  <li><a href="/contract_seller">판매계약 관리</a></li>
+                  <li><a href="javascript:pageUrl('/sot_bizsite_conf')">판매자 사이트 설정</a></li>
+                  <li><a href="javascript:pageUrl('/sot_my_product')">판매상품 관리</a></li>
+                  <li><a href="javascript:pageUrl('/contract_seller')">판매계약 관리</a></li>
                 <% } %>
 
-                <li><a href="/contract_buyer">구매계약리스트</a></li>
-                <li><a href="/favorite_product">관심상품</a></li>
-                <li><a href="/goodbye_member">회원탈퇴</a></li>
-                <li><a href="/msgbox">메시지 함</a></li>
+                <li><a href="javascript:pageUrl('/contract_buyer')">구매계약리스트</a></li>
+                <li><a href="javascript:pageUrl('/favorite_product')">관심상품</a></li>
+                <li><a href="javascript:pageUrl('/goodbye_member')">회원탈퇴</a></li>
+                <li><a href="javascript:pageUrl('/msgbox')">메시지 함</a></li>
                 <% if (req.session.biz) { %>
-                  <li><a href="/api_setting">SOT API셋팅</a></li>
+                  <li><a href="javascript:pageUrl('/api_setting')">SOT API셋팅</a></li>
                 <% } %>
               </ul>
             </li>

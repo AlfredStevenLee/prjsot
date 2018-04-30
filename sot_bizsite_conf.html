@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<!--
+	Editorial by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+
+		<!-- 공용 header 삽입 부 -->
+		<% include ./head_common.ejs %>
+
+
+	</head>
+
+
+	<body>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+							<% include ./logo_common.ejs %>
+
+							<!-- Section -->
+								<section>
+									<header class="major">
+										<h2>판매자 사이트 설정</h2>
+									</header>
+									<div class="features">
+										<article>
+											<!--span class="icon fa-diamond"></span-->
+											<div class="content">
+												<div id = "regist_form">
+
+<% if (bizsite_data == undefined) { %>
+
+													<form id="product_regist_form" enctype="multipart/form-data">
+														사용여부 : <input type="radio" name="bizsite_yn" id="bizsite_y" value="Y" checked> <label for="bizsite_y">활성</label> / <input type="radio" name="bizsite_yn" id="bizsite_n" value="N"><label for="bizsite_n">비활성</label> </br>
+														사이트 식별자 : <input type="text" name="bizsite_name" id="bizsite_name" data-validation="required length" data-validation-length="4-30"> </br>
+														사이트 로고 : <input type="file" name="bizsite_img" id="bizsite_image"> </br></br>
+
+														<button type="button" class="fit" onclick='openEditor()'>사이트 소개 편집</button>
+														<div id="prod_preview" class="box" style="overflow:scroll;height:300px">사이트 소개 미리보기</div>
+														<input type="submit" id="product_regist" value="저장">
+
+														<input type="hidden" name="reg_type" id="reg_type" value="NEW">
+														<input type="hidden" name="prod_desc" id="prod_desc" value="null">
+													</form>
+<% } else { %>
+													<div style="margin-bottom:20px"><li>현재 설정된 사이트 주소는 아래와 같습니다. 복사해서 사용하세요.<br> URL : <a href="http://127.0.0.1:8080/sotmain?biz=<%-bizsite_data.bizsite_name%>" target="_blank"> http://127.0.0.1:8080/sotmain?biz=<%-bizsite_data.bizsite_name%></a></li></div>
+													<form id="product_regist_form" enctype="multipart/form-data">
+														사용여부 : <input type="radio" name="bizsite_yn" id="bizsite_y" value="Y" checked> <label for="bizsite_y">활성</label> / <input type="radio" name="bizsite_yn" id="bizsite_n" value="N"><label for="bizsite_n">비활성</label> </br>
+														사이트 식별자 : <input type="text" name="bizsite_name" id="bizsite_name" data-validation="required length" data-validation-length="4-30" value="<%-bizsite_data.bizsite_name%>"> </br>
+														사이트 로고 : <div class="image" style="width:100%"><img id="preview_box" src="/uploads/<%-bizsite_data.logo_url%>" style="width:70%"></div><input type="file" name="bizsite_img" id="bizsite_image"> </br></br>
+
+														<button type="button" class="fit" onclick='openEditor()'>사이트 소개 편집</button>
+														<div id="prod_preview" class="box" style="overflow:scroll;height:300px">
+															<% if (bizsite_data.description != "null") { %>
+															  <%-bizsite_data.description%>
+															<% } %>
+														</div>
+														<input type="submit" id="product_regist" value="저장">
+
+														<input type="hidden" name="prod_desc" id="prod_desc" value="">
+														<input type="hidden" name="img_origin" id="img_origin" value="<%-bizsite_data.logo_url%>">
+														<input type="hidden" name="bizsite_id" id="bizsite_id" value="<%-bizsite_data.id%>">
+														<input type="hidden" name="reg_type" id="reg_type" value="UPDATE">
+													</form>
+<% } %>
+												</div>
+
+											</div>
+										</article>
+									</div>
+								</section>
+
+
+						</div>
+					</div>
+
+				<!-- 왼쪽 사이드바 include 부분 -->
+				<% include ./sidebar_common.ejs %>
+
+			</div>
+
+	</body>
+
+
+  <!--자바스크립트 기입부-->
+
+	<script>
+
+		$(document).ready(function(){
+
+			<% if (bizsite_data != undefined) { %>
+
+				<% if (bizsite_data.bizsite_yn == "Y") { %>
+					$("#bizsite_y").attr("checked", true);
+				<% } else {  %>
+					$("#bizsite_n").attr("checked", true);
+				<% } %>
+
+				$("#prod_desc").val($("#prod_preview").html());
+
+			<% } %>
+
+		});
+
+		$.validate({
+	    form : '#product_regist_form',
+	    modules : 'security',
+	    onSuccess : function($form) {
+	      //alert('The form '+$form.attr('id')+' is valid!');
+				submit_product();
+				return false;
+	    }
+	  });
+
+
+		function submit_product() {
+			var addr = "/action_bizsite_conf";
+
+			$.ajax({
+				url:addr,
+				type:'POST',
+				data:new FormData($('#product_regist_form')[0]),
+				cache:false,
+				contentType:false,
+				processData:false,
+				success:function(data) {
+					if(checkRestData(data)) {
+						return false;
+					}
+					var bizsite_url = "/sotmain?biz="+$("#bizsite_name").val();
+					$("#regist_form").html("사이트 설정이 정상적으로 저장되었습니다. <a href='"+bizsite_url+"' target='_blank'>여기</a>를 클릭해서 적용 사항을 확인해 보세요.");
+				}
+			});
+		}
+
+		function openEditor() {
+			window.open("/editor","editorWindow","width=500, height=400, scrollbars=yes, resizable=yes, toolbar=no");
+		}
+
+	</script>
+
+</html>
